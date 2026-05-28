@@ -1,0 +1,2711 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude OS</title>
+<script src="https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script src="https://unpkg.com/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
+<style>
+  :root {
+    --bg: #0d0d0d;
+    --surface: #161616;
+    --surface2: #1f1f1f;
+    --surface3: #2a2a2a;
+    --border: #2a2a2a;
+    --text: #e8e8e8;
+    --muted: #888;
+    --accent: #4f8ef7;
+    --danger: #f87171;
+    --yt: #ff4444;
+    --ig: #c13584;
+    --tt: #69c9d0;
+    --x: #e7e7e7;
+    --li: #0a66c2;
+    --xp: #a78bfa;
+    --ev: #34d399;
+    --copy-bg: #2a2a2a;
+    --copy-hover: #3a3a3a;
+    --copy-success: #1a3a2a;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: #1e1e1e;
+    border-bottom: 1px solid var(--border);
+    padding: 28px 40px 24px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .header-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  header h1 {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+    color: #fff;
+  }
+
+  header p {
+    color: var(--muted);
+    font-size: 13px;
+    margin-top: 3px;
+  }
+
+  .badge-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 6px;
+  }
+
+  .badge {
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  /* ── FILTER BAR ── */
+  .filter-bar {
+    background: #1e1e1e;
+    border-bottom: 1px solid var(--border);
+    padding: 0 40px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .filter-bar::-webkit-scrollbar { display: none; }
+
+  .filter-btn {
+    background: none;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 12px 14px;
+    white-space: nowrap;
+    border-bottom: 2px solid transparent;
+    transition: color 0.15s, border-color 0.15s;
+  }
+
+  .filter-btn:hover { color: var(--text); }
+
+  .filter-btn.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+
+  .filter-btn[data-filter="yt"].active   { color: var(--yt);  border-bottom-color: var(--yt);  }
+  .filter-btn[data-filter="ig"].active   { color: var(--ig);  border-bottom-color: var(--ig);  }
+  .filter-btn[data-filter="tt"].active   { color: var(--tt);  border-bottom-color: var(--tt);  }
+  .filter-btn[data-filter="x"].active    { color: var(--x);   border-bottom-color: var(--x);   }
+  .filter-btn[data-filter="li"].active   { color: var(--li);  border-bottom-color: var(--li);  }
+  .filter-btn[data-filter="xp"].active   { color: var(--xp);  border-bottom-color: var(--xp);  }
+  .filter-btn[data-filter="ev"].active   { color: var(--ev);  border-bottom-color: var(--ev);  }
+
+  .filter-divider {
+    width: 1px;
+    height: 20px;
+    background: var(--border);
+    margin: 0 4px;
+    flex-shrink: 0;
+  }
+
+  /* ── SEARCH ── */
+  .search-wrap {
+    padding: 20px 40px 0;
+  }
+
+  .search-input {
+    width: 100%;
+    max-width: 500px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-size: 14px;
+    padding: 9px 14px 9px 36px;
+    outline: none;
+    transition: border-color 0.15s;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23666' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.099zm-5.242 1.656a5.5 5.5 0 1 1 0-11 5.5 5.5 0 0 1 0 11z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: 11px center;
+  }
+
+  .search-input:focus { border-color: var(--accent); }
+  .search-input::placeholder { color: var(--muted); }
+
+  /* ── MAIN ── */
+  main {
+    padding: 24px 40px 80px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  /* ── SECTION HEADER ── */
+  .section-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 36px 0 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-label:first-child { margin-top: 12px; }
+
+  /* ── GRID ── */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(560px, 1fr));
+    gap: 16px;
+  }
+
+  /* ── CARD ── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+
+  .card:hover {
+    border-color: #3a3a3a;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+  }
+
+  .card-header {
+    padding: 16px 18px 12px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .platform-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 6px;
+  }
+
+  .card[data-platform="yt"]  .platform-dot { background: var(--yt);  }
+  .card[data-platform="ig"]  .platform-dot { background: var(--ig);  }
+  .card[data-platform="tt"]  .platform-dot { background: var(--tt);  }
+  .card[data-platform="x"]   .platform-dot { background: var(--x);   }
+  .card[data-platform="li"]  .platform-dot { background: var(--li);  }
+  .card[data-platform="xp"]  .platform-dot { background: var(--xp);  }
+  .card[data-platform="ev"]  .platform-dot { background: var(--ev);  }
+
+  .card-title-group { flex: 1; min-width: 0; }
+
+  .card-id {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    color: var(--muted);
+    font-family: 'SF Mono', 'Consolas', monospace;
+  }
+
+  .card-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #fff;
+    margin-top: 2px;
+    line-height: 1.3;
+  }
+
+  .card-vars {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 5px;
+    font-family: 'SF Mono', 'Consolas', monospace;
+    word-break: break-word;
+  }
+
+  .card-vars span {
+    color: #6b9bfc;
+    background: rgba(79,142,247,0.08);
+    border-radius: 3px;
+    padding: 0 3px;
+    margin: 1px 2px;
+    display: inline-block;
+  }
+
+  .platform-tag {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 4px;
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+
+  .card[data-platform="yt"]  .platform-tag { background: rgba(255,68,68,0.12);   color: var(--yt);  }
+  .card[data-platform="ig"]  .platform-tag { background: rgba(193,53,132,0.12);  color: var(--ig);  }
+  .card[data-platform="tt"]  .platform-tag { background: rgba(105,201,208,0.12); color: var(--tt);  }
+  .card[data-platform="x"]   .platform-tag { background: rgba(231,231,231,0.08); color: var(--x);   }
+  .card[data-platform="li"]  .platform-tag { background: rgba(10,102,194,0.15);  color: #4d9de0;    }
+  .card[data-platform="xp"]  .platform-tag { background: rgba(167,139,250,0.12); color: var(--xp);  }
+  .card[data-platform="ev"]  .platform-tag { background: rgba(52,211,153,0.12);  color: var(--ev);  }
+
+  /* ── PROMPT BLOCK ── */
+  .prompt-wrap {
+    position: relative;
+    flex: 1;
+    display: none;
+  }
+  .card.open .prompt-wrap { display: block; }
+
+  .prompt-text {
+    font-family: 'SF Mono', 'Consolas', 'Courier New', monospace;
+    font-size: 12.5px;
+    line-height: 1.7;
+    color: #c8d0e0;
+    padding: 16px 18px 52px;
+    white-space: pre-wrap;
+    word-break: break-word;
+    background: var(--surface2);
+    min-height: 120px;
+  }
+
+  /* ── COPY BUTTON ── */
+  .copy-btn {
+    position: absolute;
+    bottom: 12px;
+    right: 12px;
+    background: var(--copy-bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--muted);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 6px 12px;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+  }
+
+  .copy-btn:hover {
+    background: var(--copy-hover);
+    color: var(--text);
+    border-color: #444;
+  }
+
+  .copy-btn.copied {
+    background: var(--copy-success);
+    border-color: #2d6b4f;
+    color: var(--ev);
+  }
+
+  .copy-btn svg { width: 13px; height: 13px; flex-shrink: 0; }
+
+  /* ── NO RESULTS ── */
+  .no-results {
+    text-align: center;
+    color: var(--muted);
+    padding: 60px 20px;
+    font-size: 15px;
+    display: none;
+    grid-column: 1 / -1;
+  }
+
+  /* ── OUTPUT MODE BADGE ── */
+  .mode-badge {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    padding: 2px 6px;
+    border-radius: 3px;
+    margin-left: 6px;
+    vertical-align: middle;
+  }
+
+  .mode-prose { background: rgba(79,142,247,0.12); color: #6b9bfc; }
+  .mode-list  { background: rgba(167,139,250,0.12); color: #a78bfa; }
+
+  /* ── PAGE LINK (in filter bar) ── */
+  a.filter-btn {
+    text-decoration: none;
+    color: var(--muted);
+  }
+
+  a.filter-btn:hover { color: var(--accent); }
+
+  /* ── COLLAPSIBLE ── */
+  .card-header {
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.15s;
+  }
+  .card-header:hover { background: rgba(255,255,255,0.03); }
+
+  .card-select {
+    width: 15px;
+    height: 15px;
+    accent-color: var(--accent);
+    cursor: pointer;
+    flex-shrink: 0;
+    margin-top: 4px;
+  }
+
+  .card-chevron {
+    width: 14px;
+    height: 14px;
+    color: var(--muted);
+    flex-shrink: 0;
+    transition: transform 0.2s;
+    margin-top: 4px;
+  }
+  .card.open .card-chevron { transform: rotate(180deg); }
+
+  .card.selected {
+    border-color: rgba(79,142,247,0.4);
+    background: rgba(79,142,247,0.02);
+  }
+
+  /* ── EXPORT TOOLBAR ── */
+  .export-toolbar {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    padding: 12px 40px;
+    display: none;
+    align-items: center;
+    gap: 12px;
+    z-index: 200;
+    box-shadow: 0 -4px 24px rgba(0,0,0,0.5);
+  }
+  .export-toolbar.show { display: flex; }
+  .export-count-label { font-size: 13px; font-weight: 600; color: #fff; flex: 1; }
+  .export-action-btn {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 7px 14px;
+    font-family: inherit;
+    transition: all 0.15s;
+  }
+  .export-action-btn:hover { background: var(--surface3); color: var(--text); }
+  .export-action-btn.primary { background: var(--accent); border-color: transparent; color: #fff; }
+  .export-action-btn.primary:hover { opacity: 0.88; }
+  .export-clear-btn {
+    background: none; border: none; color: var(--muted);
+    cursor: pointer; font-size: 12px; padding: 0; font-family: inherit;
+  }
+  .export-clear-btn:hover { color: var(--danger); }
+
+  /* ── OTHER TOOLS DROPDOWN ── */
+  .tools-dropdown { position: relative; }
+  .tools-menu {
+    display: none;
+    position: fixed;
+    background: var(--surface);
+    border: 1px solid #3a3a3a;
+    border-radius: 8px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+    min-width: 230px;
+    z-index: 200;
+    overflow: hidden;
+  }
+  .tools-menu.open { display: block; }
+  .tools-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 16px;
+    text-decoration: none;
+    color: var(--text);
+    transition: background 0.12s;
+    border-bottom: 1px solid var(--border);
+  }
+  .tools-link:last-child { border-bottom: none; }
+  .tools-link:hover { background: var(--surface2); }
+  .tools-link-icon { font-size: 15px; flex-shrink: 0; width: 20px; text-align: center; }
+  .tools-link-name { display: block; font-size: 13px; font-weight: 500; }
+  .tools-link-desc { display: block; font-size: 11px; color: var(--muted); margin-top: 1px; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 700px) {
+    header, .filter-bar, .search-wrap, main { padding-left: 16px; padding-right: 16px; }
+    .grid { grid-template-columns: 1fr; }
+    header h1 { font-size: 18px; }
+    .export-toolbar { padding: 12px 16px; flex-wrap: wrap; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-top">
+    <div>
+      <h1>Claude OS</h1>
+      <p>70 model-agnostic prompts for YouTube, Instagram, TikTok, X, and LinkedIn — with a built-in draft evaluator.</p>
+      <div class="badge-row">
+        <span class="badge">v2.0.0</span>
+        <span class="badge">Foundational</span>
+        <span class="badge">Model-Agnostic</span>
+        <span class="badge">70 assets</span>
+      </div>
+    </div>
+    <a href="https://www.skool.com/simple-content-collective-3799/about" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;padding:9px 18px;background:#1a3a6b;color:#fff;border-radius:8px;font-size:13px;font-weight:600;text-decoration:none;white-space:nowrap;flex-shrink:0;transition:background .15s;" onmouseover="this.style.background='#1e4a8a'" onmouseout="this.style.background='#1a3a6b'">Join My Skool</a>
+  </div>
+</header>
+
+<nav class="filter-bar">
+  <button class="filter-btn active" data-filter="all">All  <small style="opacity:.5">70</small></button>
+  <div class="filter-divider"></div>
+  <button class="filter-btn" data-filter="yt">YouTube  <small style="opacity:.5">10</small></button>
+  <button class="filter-btn" data-filter="ig">Instagram  <small style="opacity:.5">10</small></button>
+  <button class="filter-btn" data-filter="tt">TikTok  <small style="opacity:.5">10</small></button>
+  <button class="filter-btn" data-filter="x">X  <small style="opacity:.5">10</small></button>
+  <button class="filter-btn" data-filter="li">LinkedIn  <small style="opacity:.5">10</small></button>
+  <button class="filter-btn" data-filter="xp">Cross-Platform  <small style="opacity:.5">10</small></button>
+  <button class="filter-btn" data-filter="ev">Evaluators  <small style="opacity:.5">10</small></button>
+  <div class="filter-divider"></div>
+  <div class="tools-dropdown" id="toolsDropdown">
+    <button class="filter-btn" id="toolsBtn" onclick="toggleToolsMenu()">Other Tools ▾</button>
+    <div class="tools-menu" id="toolsMenu">
+      <a href="automation-idea-engine.html" class="tools-link">
+        <span class="tools-link-icon">⚡</span>
+        <span>
+          <span class="tools-link-name">Automation Idea Engine</span>
+          <span class="tools-link-desc">AI workflow automation ideas</span>
+        </span>
+      </a>
+      <a href="content-repurposer.html" class="tools-link">
+        <span class="tools-link-icon">♻</span>
+        <span>
+          <span class="tools-link-name">Content Repurposer</span>
+          <span class="tools-link-desc">Repurpose content across platforms</span>
+        </span>
+      </a>
+      <a href="claude-code-165-ideas.html" class="tools-link">
+        <span class="tools-link-icon">💡</span>
+        <span>
+          <span class="tools-link-name">165 Web App Ideas</span>
+          <span class="tools-link-desc">Claude Code project index</span>
+        </span>
+      </a>
+    </div>
+  </div>
+</nav>
+
+<div class="search-wrap">
+  <input class="search-input" type="text" placeholder="Search prompts by title, ID, or keyword…" id="searchInput">
+</div>
+
+<main>
+  <div class="section-label" data-section="prose">Section A — Prose Prompts</div>
+  <div class="grid" id="grid-prose">
+
+    <!-- CC-YT-001 -->
+    <div class="card" data-platform="yt" data-section="prose" data-keywords="youtube video idea generator niche audience channel goal">
+      <div class="card-header">
+        <div class="platform-dot"></div>
+        <div class="card-title-group">
+          <div class="card-id">CC-YT-001 <span class="mode-badge mode-prose">Prose</span></div>
+          <div class="card-title">YouTube Video Idea Generator</div>
+          <div class="card-vars">Variables: <span>{niche}</span> <span>{audience}</span> <span>{channel_goal}</span> <span>{desired_count}</span></div>
+        </div>
+        <span class="platform-tag">YouTube</span>
+      </div>
+      <div class="prompt-wrap">
+        <pre class="prompt-text">You are a senior YouTube strategist who has helped solo creators in the {niche} space grow from zero to engaged audiences. Your task is to generate {desired_count} fresh video ideas tailored to a creator whose audience is {audience} and whose channel goal is {channel_goal}.
+
+Think first about what this audience is currently struggling with, what they are actively searching for, and where existing videos in this niche underdeliver. Then generate ideas that combine proven YouTube formats — tutorials, reactions, case studies, story-driven essays, comparisons, "I tried X for Y days," teardowns, contrarian takes — with the creator's unique angle.
+
+For each idea, write a short paragraph in plain prose that includes the working title, the underlying angle or hook, why it should resonate with this audience, and the rough format. Do not use bullet points, numbered lists, or markdown. Write conversationally, the way a strategist would brief a creator over coffee.
+
+Avoid generic clickbait premises and ideas that have been overdone in the niche. Favor specificity, novelty, and a clear emotional or intellectual hook over surface-level topics.</pre>
+        <button class="copy-btn" onclick="copyPrompt(this)">
+          <svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg>
+          Copy
+        </button>
+      </div>
+    </div>
+
+    <!-- CC-YT-002 -->
+    <div class="card" data-platform="yt" data-section="prose" data-keywords="youtube title hook optimizer click-through rate">
+      <div class="card-header">
+        <div class="platform-dot"></div>
+        <div class="card-title-group">
+          <div class="card-id">CC-YT-002 <span class="mode-badge mode-prose">Prose</span></div>
+          <div class="card-title">YouTube Title & Hook Optimizer</div>
+          <div class="card-vars">Variables: <span>{video_topic}</span> <span>{target_emotion}</span> <span>{channel_voice}</span></div>
+        </div>
+        <span class="platform-tag">YouTube</span>
+      </div>
+      <div class="prompt-wrap">
+        <pre class="prompt-text">You are a YouTube title writer with a track record of doubling click-through rates without resorting to clickbait. A creator is working on a video about {video_topic}, aiming to evoke {target_emotion} in viewers, and their channel voice can be described as {channel_voice}.
+
+Produce ten title candidates and, for each, a one-line opening hook — the first spoken sentence of the video. Write your response as flowing prose, presenting each title and hook as a short paragraph that briefly names the psychological lever the title pulls on: curiosity gap, contrarian stance, specific number, identity appeal, urgency, or novelty.
+
+Keep titles within sixty characters where possible. Match the creator's voice rather than defaulting to a generic YouTube-guru cadence. Do not use markdown lists, headers, or tables — continuous prose only, so the creator can scan and pick favorites.</pre>
+        <button class="copy-btn" onclick="copyPrompt(this)">
+          <svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg>
+          Copy
+        </button>
+      </div>
+    </div>
+
+    <!-- CC-YT-003 -->
+    <div class="card" data-platform="yt" data-section="prose" data-keywords="youtube script outline builder retention">
+      <div class="card-header">
+        <div class="platform-dot"></div>
+        <div class="card-title-group">
+          <div class="card-id">CC-YT-003 <span class="mode-badge mode-prose">Prose</span></div>
+          <div class="card-title">YouTube Script Outline Builder</div>
+          <div class="card-vars">Variables: <span>{video_topic}</span> <span>{audience_pain_point}</span> <span>{video_length}</span></div>
+        </div>
+        <span class="platform-tag">YouTube</span>
+      </div>
+      <div class="prompt-wrap">
+        <pre class="prompt-text">You are a video scriptwriter who specializes in retention. A solo creator is making a video about {video_topic}, targeted at viewers experiencing {audience_pain_point}, with a target length of {video_length}.
+
+Reason through the structure before drafting. First, identify the single promise the video must deliver on. Second, design the cold open that earns the first thirty seconds. Third, sketch the act structure — the build, the payoffs, the loops that pull viewers from one chapter to the next. Fourth, name two or three retention risks (places where viewers typically drop off) and how to counter them.
+
+Then write the outline itself in plain prose paragraphs, one paragraph per section of the video. Each paragraph should describe what happens on screen and what the creator says, in enough detail that the creator can sit down and record without further planning. Avoid bullet lists and section headers — let the structure emerge through clear topic sentences and transitions.</pre>
+        <button class="copy-btn" onclick="copyPrompt(this)">
+          <svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg>
+          Copy
+        </button>
+      </div>
+    </div>
+
+    <!-- CC-YT-004 -->
+    <div class="card" data-platform="yt" data-section="prose" data-keywords="youtube description tags seo optimizer metadata search" data-id="CC-YT-004">
+      <div class="card-header">
+        <div class="platform-dot"></div>
+        <div class="card-title-group">
+          <div class="card-id">CC-YT-004 <span class="mode-badge mode-prose">Prose</span></div>
+          <div class="card-title">YouTube Description & Tags Optimizer</div>
+          <div class="card-vars">Variables: <span>{video_title}</span> <span>{video_summary}</span> <span>{target_keywords}</span> <span>{channel_niche}</span></div>
+        </div>
+        <span class="platform-tag">YouTube</span>
+      </div>
+      <div class="prompt-wrap">
+        <pre class="prompt-text">You are a YouTube SEO specialist who writes descriptions that serve two audiences simultaneously: the algorithm and the human viewer. A creator in the {channel_niche} space has just finished a video titled "{video_title}." The video covers: {video_summary}. The target keywords are: {target_keywords}.
+
+Write a full video description in plain prose. Open with two to three sentences that hook a human reader — why this video matters, what they will walk away knowing — without keyword-stuffing the first line. Follow with a paragraph that naturally works in the target keywords and related terms the algorithm rewards, while still reading fluently to a person skimming it. Close with a short paragraph containing timestamps if the video has chapters, links the creator typically includes, and a subscribe prompt phrased in the creator's voice rather than a generic plea.
+
+Then write a tag set of twenty to thirty tags in a single comma-separated line, ordered from most specific to most broad. Explain in one sentence after the tag set why you ordered them that way. No markdown headers or bullet lists — continuous prose with the tag line as the only exception.</pre>
+        <button class="copy-btn" onclick="copyPrompt(this)"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg> Copy</button>
+      </div>
+    </div>
+
+    <!-- CC-YT-005 -->
+    <div class="card" data-platform="yt" data-section="prose" data-keywords="youtube channel trailer script subscriber convert first-time visitor" data-id="CC-YT-005">
+      <div class="card-header">
+        <div class="platform-dot"></div>
+        <div class="card-title-group">
+          <div class="card-id">CC-YT-005 <span class="mode-badge mode-prose">Prose</span></div>
+          <div class="card-title">YouTube Channel Trailer Script</div>
+          <div class="card-vars">Variables: <span>{channel_niche}</span> <span>{target_audience}</span> <span>{creator_name}</span> <span>{unique_value_proposition}</span></div>
+        </div>
+        <span class="platform-tag">YouTube</span>
+      </div>
+      <div class="prompt-wrap">
+        <pre class="prompt-text">You are a channel strategist who writes trailer scripts that convert first-time visitors into subscribers. The channel covers {channel_niche}, targets {target_audience}, is run by {creator_name}, and the unique value proposition is: {unique_value_proposition}.
+
+A channel trailer has one job: make a stranger trust that this channel is worth following. It runs sixty to ninety seconds. It does not explain the creator's life story. It answers three questions in order — what this channel is about, who it is for, and why the viewer should subscribe today rather than tomorrow.
+
+Write the script in plain prose as the creator would speak it directly to camera. Open with a single line that speaks directly to the target viewer's situation or desire, not a generic welcome. Develop the value proposition through one or two concrete examples of what the viewer will get from the channel. Close with a subscribe ask that feels earned rather than demanded. Include brief parenthetical cues for B-roll or visual cuts where they strengthen the script. No bullet lists, no headers — a continuous spoken monologue.</pre>
+        <button class="copy-btn" onclick="copyPrompt(this)"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg> Copy</button>
+      </div>
+    </div>
+
+    <!-- CC-IG-001 -->
+    <div class="card" data-platform="ig" data-section="prose" data-keywords="instagram carousel architect slides educational">
+      <div class="card-header">
+        <div class="platform-dot"></div>
+        <div class="card-title-group">
+          <div class="card-id">CC-IG-001 <span class="mode-badge mode-prose">Prose</span></div>
+          <div class="card-title">Instagram Carousel Architect</div>
+          <div class="card-vars">Variables: <span>{topic}</span> <span>{audience}</span> <span>{slide_count}</span> <span>{brand_voice}</span></div>
+        </div>
+        <span class="platform-tag">Instagram</span>
+      </div>
+      <div class="prompt-wrap">
+        <pre class="prompt-text">You are an Instagram content designer who builds save-worthy educational carousels. A creator with a {brand_voice} voice wants to publish a {slide_count}-slide carousel on {topic} for an audience of {audience}.
+
+Draft the full carousel as continuous prose, walking through each slide in order. For each slide, describe the on-image text — kept to roughly five to twelve words — the visual concept or layout, and the role the slide plays in the larger arc: hook, problem, reframe, framework, example, recap, or call to action.
+
+Open with a hook slide that creates an open loop, end with a clear save-or-share-worthy payoff, and make sure each middle slide carries one discrete insight rather than restating the previous. Write the draft as a flowing brief a designer could read top to bottom, not a numbered list. No markdown formatting.</pre>
+        <button class="copy-btn" onclick="copyPrompt(this)">
+          <svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg>
+          Copy
+        </button>
+      </div>
+    </div>
+
+    <!-- CC-IG-002 -->
+    <div class="card" data-platform="ig" data-section="prose" data-keywords="instagram reel hook generator scroll stop pattern interrupt">
+      <div class="card-header">
+        <div class="platform-dot"></div>
+        <div class="card-title-group">
+          <div class="card-id">CC-IG-002 <span class="mode-badge mode-prose">Prose</span></div>
+          <div class="card-title">Instagram Reel Hook Generator</div>
+          <div class="card-vars">Variables: <span>{topic}</span> <span>{pattern_interrupt_style}</span> <span>{desired_emotion}</span></div>
+        </div>
+        <span class="platform-tag">Instagram</span>
+      </div>
+      <div class="prompt-wrap">
+        <pre class="prompt-text">You are a short-form video hook writer who studies what makes viewers stop scrolling in the first two seconds. A solo creator is making a Reel about {topic} and wants the opening to use a {pattern_interrupt_style} approach while making the viewer feel {desired_emotion}.
+
+Write twelve different opening hooks for this Reel. Present them as continuous prose, one hook per short paragraph, with a sentence after each explaining the mechanism — why a viewer's thumb stops. Each hook should be speakable in three seconds or less, written the way the creator would actually say it out loud, and should avoid worn formulas like "Did you know" or "Stop what you're doing."
+
+Vary the approaches across curiosity, contrarian claims, specific numbers, raw confession, visual setup, dialogue snippets, and direct address. No bullet lists, no tables, no markdown — plain readable prose only.</pre>
+        <button class="copy-btn" onclick="copyPrompt(this)">
+          <svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg>
+          Copy
+        </button>
+      </div>
+    </div>
+
+    <!-- CC-IG-003 -->
+    <div class="card" data-platform="ig" data-section="prose" data-keywords="instagram bio profile optimizer link conversion niche" data-id="CC-IG-003">
+      <div class="card-header">
+        <div class="platform-dot"></div>
+        <div class="card-title-group">
+          <div class="card-id">CC-IG-003 <span class="mode-badge mode-prose">Prose</span></div>
+          <div class="card-title">Instagram Bio & Profile Optimizer</div>
+          <div class="card-vars">Variables: <span>{creator_niche}</span> <span>{target_audience}</span> <span>{creator_name}</span> <span>{main_offer_or_goal}</span></div>
+        </div>
+        <span class="platform-tag">Instagram</span>
+      </div>
+      <div class="prompt-wrap">
+        <pre class="prompt-text">You are an Instagram profile strategist who treats the bio as conversion copy. The creator is {creator_name}, working in {creator_niche}, targeting {target_audience}, with a primary goal of {main_offer_or_goal}.
+
+The Instagram bio has 150 characters. Every word competes. Write the bio as a single block of plain prose — as it would appear in the app — that answers three questions a first-time profile visitor asks in three seconds: who is this person, what do they post about, and what is in it for me if I follow?
+
+After the bio, write a short paragraph explaining each choice: why you led with what you did, what the line breaks do (Instagram treats them as visual breathing room), and how the call to action in the link-in-bio line connects to {main_offer_or_goal}. Then write two alternative bio versions in the same prose format, each pulling a different angle — one leading with the audience's outcome, one leading with the creator's credentials or niche authority. No markdown formatting.</pre>
+        <button class="copy-btn" onclick="copyPrompt(this)"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg> Copy</button>
+      </div>
+    </div>
+
+    <!-- CC-IG-004 -->
+    <div class="card" data-platform="ig" data-section="prose" data-keywords="instagram story sequence planner engagement poll link sticker" data-id="CC-IG-004">
+      <div class="card-header">
+        <div class="platform-dot"></div>
+        <div class="card-title-group">
+          <div class="card-id">CC-IG-004 <span class="mode-badge mode-prose">Prose</span></div>
+          <div class="card-title">Instagram Story Sequence Planner</div>
+          <div class="card-vars">Variables: <span>{story_goal}</span> <span>{audience}</span> <span>{num_stories}</span> <span>{brand_voice}</span></div>
+        </div>
+        <span class="platform-tag">Instagram</span>
+      </div>
+      <div class="prompt-wrap">
+        <pre class="prompt-text">You are an Instagram Stories strategist who designs sequences that move viewers from tap-to-open to taking action. A creator with a {brand_voice} voice wants to run a {num_stories}-story sequence aimed at {audience} to achieve this goal: {story_goal}.
+
+Stories are ephemeral and viewers skip fast. A sequence needs a hook in the first frame, a reason to keep tapping in every subsequent frame, and a payoff in the final frame that makes the goal feel earned rather than pushed.
+
+Write the sequence as flowing prose, describing each story in order: what appears on screen (text overlay, image, video, or interactive element), what the creator says or writes, which interactive feature to use if any (poll, question box, link sticker, quiz), and how that frame connects to the next. Keep the description of each story to two to three sentences — enough to shoot from, not so long it becomes a script. No numbered lists or bullet points — write it as a narrative walkthrough the creator can read and immediately produce.</pre>
+        <button class="copy-btn" onclick="copyPrompt(this)"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg> Copy</button>
+      </div>
+    </div>
+
+    <!-- CC-IG-005 -->
+    <div class="card" data-platform="ig" data-section="prose" data-keywords="instagram caption writer single image engagement save share" data-id="CC-IG-005">
+      <div class="card-header">
+        <div class="platform-dot"></div>
+        <div class="card-title-group">
+          <div class="card-id">CC-IG-005 <span class="mode-badge mode-prose">Prose</span></div>
+          <div class="card-title">Instagram Single-Image Caption Writer</div>
+          <div class="card-vars">Variables: <span>{image_description}</span> <span>{topic}</span> <span>{audience}</span> <span>{desired_action}</span></div>
+        </div>
+        <span class="platform-tag">Instagram</span>
+      </div>
+      <div class="prompt-wrap">
+        <pre class="prompt-text">You are a caption writer who understands that on Instagram, the image earns the stop and the caption earns the save. A creator is posting an image that shows {image_description}. The post is about {topic}, aimed at {audience}, and the desired action is {desired_action}.
+
+Write a caption in plain prose — as it would appear in the app — structured in three movements. Open with a single line that stops the reader mid-scroll; it should extend or deepen what the image shows, not describe it. Develop the middle in compact paragraphs of two to three sentences that deliver a genuine insight, story beat, or perspective shift related to {topic}. Close with a natural invitation toward {desired_action} — not a command, a question, or a generic "link in bio" placeholder, but something that makes the reader want to respond.
+
+After the caption, write a short prose note explaining your hook choice and how you calibrated length for {audience}. Then suggest three hashtag clusters — each a line of five to eight tags — targeting different audience entry points: niche-specific, topic-broad, and discovery. No markdown formatting in the caption itself.</pre>
+        <button class="copy-btn" onclick="copyPrompt(this)"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg> Copy</button>
+      </div>
+    </div>
+
+    <!-- CC-TT-001 -->
+    <div class="card" data-platform="tt" data-section="prose" data-keywords="tiktok trend adapter format trending native">
+      <div class="card-header">
+        <div class="platform-dot"></div>
+        <div class="card-title-group">
+          <div class="card-id">CC-TT-001 <span class="mode-badge mode-prose">Prose</span></div>
+          <div class="card-title">TikTok Trend Adapter</div>
+          <div class="card-vars">Variables: <span>{trending_format}</span> <span>{creator_niche}</span> <span>{core_message}</span></div>
+        </div>
+        <span class="platform-tag">TikTok</span>
+      </div>
+      <div class="prompt-wrap">
+        <pre class="prompt-text">You are a TikTok strategist fluent in the platform's evolving native formats. A creator working in the {creator_niche} space wants to ride the {trending_format} format while delivering this core message: {core_message}.
+
+Begin by briefly characterizing the trending format — its tempo, on-screen conventions, audio or visual signature, and why it currently performs. Then translate the creator's message into that format without forcing a fit. If the format genuinely doesn't suit the message, say so plainly and propose the closest viable alternative rather than producing a version that will flop.
+
+Deliver the result as a prose script: describe what the camera shows, what overlay text appears, what the creator says, and what audio or sound choices to make. Write it as if narrating a finished video to someone over the phone — continuous prose, no bullet points or storyboard grids. Keep it under sixty seconds of screen time.</pre>
+        <button class="copy-btn" onclick="copyPrompt(this)">
+          <svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg>
+          Copy
+        </button>
+      </div>
+    </div>
+
+    <!-- CC-TT-002 -->
+    <div class="card" data-platform="tt" data-section="prose" data-keywords="tiktok story hook personal anecdote storytelling">
+      <div class="card-header">
+        <div class="platform-dot"></div>
+        <div class="card-title-group">
+          <div class="card-id">CC-TT-002 <span class="mode-badge mode-prose">Prose</span></div>
+          <div class="card-title">TikTok Story Hook</div>
+          <div class="card-vars">Variables: <span>{personal_anecdote}</span> <span>{lesson}</span> <span>{audience}</span></div>
+        </div>
+        <span class="platform-tag">TikTok</span>
+      </div>
+      <div class="prompt-wrap">
+        <pre class="prompt-text">You are a storytelling coach who helps solo creators turn lived experience into TikTok videos that hold attention. The creator wants to share this anecdote: {personal_anecdote}. The lesson they want viewers to walk away with is {lesson}. Their audience is {audience}.
+
+Reframe the anecdote into a TikTok-native story arc that runs roughly forty-five to seventy-five seconds. Open with a single sentence that drops the viewer mid-tension, withhold the resolution until the final beat, and let the lesson emerge from the story rather than being lectured.
+
+Write the script as a single block of plain prose, the way the creator would speak it directly into the camera. Include cues in parentheses for tone shifts, pauses, or B-roll suggestions, but do not break into bullet points or section headers. The result should read like a monologue, not an outline.</pre>
+        <button class="copy-btn" onclick="copyPrompt(this)">
+          <svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg>
+          Copy
+        </button>
+      </div>
+    </div>
+
+    <!-- CC-TT-003 -->
+    <div class="card" data-platform="tt" data-section="prose" data-keywords="tiktok content calendar monthly planning pillars schedule batch" data-id="CC-TT-003">
+      <div class="card-header">
+        <div class="platform-dot"></div>
+        <div class="card-title-group">
+          <div class="card-id">CC-TT-003 <span class="mode-badge mode-prose">Prose</span></div>
+          <div class="card-title">TikTok Content Calendar Builder</div>
+          <div class="card-vars">Variables: <span>{creator_niche}</span> <span>{posting_frequency}</span> <span>{content_pillars}</span> <span>{period}</span></div>
+        </div>
+        <span class="platform-tag">TikTok</span>
+      </div>
+      <div class="prompt-wrap">
+        <pre class="prompt-text">You are a TikTok content strategist who builds calendars that creators can actually execute. A solo creator in {creator_niche} wants to post {posting_frequency} times per week during {period}. Their content pillars are: {content_pillars}.
+
+Before building the calendar, reason through what TikTok rewards right now: consistency of posting cadence, pillar rotation that keeps a feed varied without losing focus, and seeding at least one high-reach format per week that could drive discovery. Then match those platform dynamics to this creator's pillars and posting frequency.
+
+Write the calendar as a prose walkthrough of the full period — week by week, not a table. For each week, describe in narrative form which pillars get coverage, what the specific video concept or angle is for each post, which format to use, and why that week's mix is strategic rather than arbitrary. End with a short paragraph on what to batch-record in one session to make the schedule sustainable. No bullet points, no tables — flowing prose the creator can read and immediately act on.</pre>
+        <button class="copy-btn" onclick="copyPrompt(this)"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg> Copy</button>
+      </div>
+    </div>
+
+    <!-- CC-TT-004 -->
+    <div class="card" data-platform="tt" data-section="prose" data-keywords="tiktok comment reply community engagement response creator" data-id="CC-TT-004">
+      <div class="card-header">
+        <div class="platform-dot"></div>
+        <div class="card-title-group">
+          <div class="card-id">CC-TT-004 <span class="mode-badge mode-prose">Prose</span></div>
+          <div class="card-title">TikTok Comment & Community Reply Writer</div>
+          <div class="card-vars">Variables: <span>{original_video_topic}</span> <span>{comment_text}</span> <span>{creator_voice}</span></div>
+        </div>
+        <span class="platform-tag">TikTok</span>
+      </div>
+      <div class="prompt-wrap">
+        <pre class="prompt-text">You are a community strategist who coaches creators on using TikTok comments to deepen audience relationships, drive re-engagement, and surface new video ideas. The creator's video was about {original_video_topic}. A viewer left this comment: {comment_text}. The creator's voice can be described as {creator_voice}.
+
+First, characterize what type of comment this is: genuine question, disagreement, emotional response, surface-level praise, challenge, or content idea. Explain in one sentence why the type matters for how to respond.
+
+Then write three reply options in plain prose, each taking a different approach — one that answers directly and invites a follow-up, one that validates the commenter and deepens the conversation, and one that teases a future video response. Each reply should sound like the creator, not a brand. Keep each reply under 150 characters where possible since TikTok comments reward brevity. After the three replies, write a short paragraph explaining which you would choose and why, given the comment type and the creator's voice.</pre>
+        <button class="copy-btn" onclick="copyPrompt(this)"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg> Copy</button>
+      </div>
+    </div>
+
+    <!-- CC-TT-005 -->
+    <div class="card" data-platform="tt" data-section="prose" data-keywords="tiktok bio link optimizer profile conversion follow" data-id="CC-TT-005">
+      <div class="card-header">
+        <div class="platform-dot"></div>
+        <div class="card-title-group">
+          <div class="card-id">CC-TT-005 <span class="mode-badge mode-prose">Prose</span></div>
+          <div class="card-title">TikTok Bio & Link Optimizer</div>
+          <div class="card-vars">Variables: <span>{creator_niche}</span> <span>{target_audience}</span> <span>{primary_cta}</span> <span>{link_destination}</span></div>
+        </div>
+        <span class="platform-tag">TikTok</span>
+      </div>
+      <div class="prompt-wrap">
+        <pre class="prompt-text">You are a TikTok profile strategist. A creator in {creator_niche} targets {target_audience} and wants their profile to drive {primary_cta}, with their link pointing to {link_destination}.
+
+TikTok bios are capped at 80 characters. That is one sentence — sometimes less. Every character competes. The bio must answer one question in under two seconds: why should this person follow me? Not who you are, not your achievements — the specific value the viewer gets.
+
+Write the bio as it would appear on the profile: 80 characters maximum, plain text, no formatting. Then write a short prose explanation of every word choice: what it signals to {target_audience}, why you avoided certain words, and how the bio sets up the link click. Follow with two alternative versions targeting different angles — one emphasizing identity (who the creator is), one emphasizing outcome (what the viewer gains). For each version also write the link anchor text that completes the bio-to-link journey — the four to eight words that appear as the clickable link label driving to {link_destination}.</pre>
+        <button class="copy-btn" onclick="copyPrompt(this)"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg> Copy</button>
+      </div>
+    </div>
+
+    <!-- CC-X-001 -->
+    <div class="card" data-platform="x" data-section="prose" data-keywords="x twitter thread builder bookmark argument">
+      <div class="card-header">
+        <div class="platform-dot"></div>
+        <div class="card-title-group">
+          <div class="card-id">CC-X-001 <span class="mode-badge mode-prose">Prose</span></div>
+          <div class="card-title">X Thread Builder</div>
+          <div class="card-vars">Variables: <span>{topic}</span> <span>{thread_purpose}</span> <span>{evidence_or_examples}</span> <span>{desired_length}</span></div>
+        </div>
+        <span class="platform-tag">X</span>
+      </div>
+      <div class="prompt-wrap">
+        <pre class="prompt-text">You are a long-time X writer who builds threads that get bookmarked and re-read. A creator wants to write a thread on {topic} for the purpose of {thread_purpose}, drawing on these examples or evidence: {evidence_or_examples}. The desired length is roughly {desired_length} posts.
+
+First, work through the through-line: what claim does the thread defend, and what ordering of arguments defends it most strongly? Identify the opening post — it should earn the next click on its own, presenting a complete idea that creates curiosity for what follows.
+
+Then write the thread out in continuous prose, separating each post with a blank line. Keep posts under 280 characters. The first post is the hook, the middle posts develop the argument with concrete examples, and the final post lands the takeaway and offers a clear next step. Write in the creator's voice rather than a generic Twitter-guru cadence. No bullets within posts, no markdown formatting.</pre>
+        <button class="copy-btn" onclick="copyPrompt(this)">
+          <svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg>
+          Copy
+        </button>
+      </div>
+    </div>
+
+    <!-- CC-X-002 -->
+    <div class="card" data-platform="x" data-section="prose" data-keywords="x twitter profile bio optimizer pinned post first impression" data-id="CC-X-002">
+      <div class="card-header">
+        <div class="platform-dot"></div>
+        <div class="card-title-group">
+          <div class="card-id">CC-X-002 <span class="mode-badge mode-prose">Prose</span></div>
+          <div class="card-title">X Profile & Bio Optimizer</div>
+          <div class="card-vars">Variables: <span>{creator_focus}</span> <span>{target_audience}</span> <span>{posting_style}</span> <span>{main_offer_or_goal}</span></div>
+        </div>
+        <span class="platform-tag">X</span>
+      </div>
+      <div class="prompt-wrap">
+        <pre class="prompt-text">You are an X profile strategist. A creator focused on {creator_focus} targets {target_audience}, posts in a {posting_style} style, and wants their profile to drive {main_offer_or_goal}.
+
+The X bio is 160 characters — roughly two short sentences. It is read by people who just saw a tweet they liked and are deciding whether to follow. It must answer: what do you post about and why should I care? Not your job title, not your hobbies — the specific value you deliver to {target_audience}.
+
+Write the bio as it would appear on the profile: 160 characters maximum, plain text. Then write a paragraph explaining each choice — why you opened with what you did, how you worked in {creator_focus} without listing it robotically, and how the bio connects to {main_offer_or_goal}. After that, write the pinned post: a single tweet under 280 characters that a new follower should see first — one that demonstrates your voice and makes them want to read everything you post. Explain in one sentence why that is the right pinned post for this profile.</pre>
+        <button class="copy-btn" onclick="copyPrompt(this)"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg> Copy</button>
+      </div>
+    </div>
+
+    <!-- CC-X-003 -->
+    <div class="card" data-platform="x" data-section="prose" data-keywords="x twitter engagement reply conversation community building" data-id="CC-X-003">
+      <div class="card-header">
+        <div class="platform-dot"></div>
+        <div class="card-title-group">
+          <div class="card-id">CC-X-003 <span class="mode-badge mode-prose">Prose</span></div>
+          <div class="card-title">X Engagement & Reply Writer</div>
+          <div class="card-vars">Variables: <span>{original_post}</span> <span>{post_author_context}</span> <span>{creator_voice}</span> <span>{engagement_goal}</span></div>
+        </div>
+        <span class="platform-tag">X</span>
+      </div>
+      <div class="prompt-wrap">
+        <pre class="prompt-text">You are an X strategist who treats replies as the highest-leverage growth tool on the platform. A creator with a {creator_voice} voice wants to reply to this post: {original_post}. The author context is: {post_author_context}. The engagement goal is: {engagement_goal}.
+
+The best replies on X do one of four things: add a genuinely new angle the original post missed, tell a compact story that extends the original point, offer a respectful but direct disagreement with reasoning, or ask the one question that advances the conversation without being sycophantic. They do not summarize what the original said, do not open with "Great point!", and do not ask vague questions just to appear engaged.
+
+Write five reply options in plain prose, one per short paragraph. For each, name the approach being taken (add angle, extend story, disagree, question, etc.) and write the reply as it would appear — under 280 characters, in the creator's voice, designed to further {engagement_goal}. After the five options, write one sentence recommending which to send and why.</pre>
+        <button class="copy-btn" onclick="copyPrompt(this)"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg> Copy</button>
+      </div>
+    </div>
+
+    <!-- CC-X-004 -->
+    <div class="card" data-platform="x" data-section="prose" data-keywords="x twitter content pillar strategy topics authority identity" data-id="CC-X-004">
+      <div class="card-header">
+        <div class="platform-dot"></div>
+        <div class="card-title-group">
+          <div class="card-id">CC-X-004 <span class="mode-badge mode-prose">Prose</span></div>
+          <div class="card-title">X Content Pillar Strategy</div>
+          <div class="card-vars">Variables: <span>{creator_expertise}</span> <span>{target_audience}</span> <span>{growth_goal}</span> <span>{posting_frequency}</span></div>
+        </div>
+        <span class="platform-tag">X</span>
+      </div>
+      <div class="prompt-wrap">
+        <pre class="prompt-text">You are an X content strategist who helps solo creators build a repeatable, authority-establishing presence without burning out. A creator with expertise in {creator_expertise} targets {target_audience}, wants to achieve {growth_goal}, and can post {posting_frequency} times per week.
+
+Content pillars are the recurring topic categories that give a feed coherence — they tell followers what to expect and tell the algorithm what the account is about. Too few pillars and the feed is boring; too many and the account has no identity.
+
+Design a pillar strategy in plain prose. First, explain how many pillars suit this creator's posting frequency and why. Then describe each pillar in a short paragraph: the topic, the specific angle that distinguishes it from generic coverage of that topic, an example post concept, and why it serves {growth_goal}. Then write a short paragraph on the cadence — which pillar leads each week, which appears mid-week, which closes — and how to rotate them so the feed stays fresh. No bullet points, no markdown headers.</pre>
+        <button class="copy-btn" onclick="copyPrompt(this)"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg> Copy</button>
+      </div>
+    </div>
+
+    <!-- CC-X-005 -->
+    <div class="card" data-platform="x" data-section="prose" data-keywords="x twitter newsletter teaser subscriber driver conversion" data-id="CC-X-005">
+      <div class="card-header">
+        <div class="platform-dot"></div>
+        <div class="card-title-group">
+          <div class="card-id">CC-X-005 <span class="mode-badge mode-prose">Prose</span></div>
+          <div class="card-title">X Newsletter Teaser & Subscriber Driver</div>
+          <div class="card-vars">Variables: <span>{newsletter_topic}</span> <span>{key_insight_in_issue}</span> <span>{newsletter_name}</span> <span>{target_audience}</span></div>
+        </div>
+        <span class="platform-tag">X</span>
+      </div>
+      <div class="prompt-wrap">
+        <pre class="prompt-text">You are an X writer who specializes in converting timeline followers into newsletter subscribers. A creator publishes {newsletter_name}, a newsletter for {target_audience}. The latest issue covers {newsletter_topic} and its sharpest insight is: {key_insight_in_issue}.
+
+The teaser post must do two things simultaneously: deliver enough value that it earns a bookmark or retweet on its own, and create enough curiosity gap that the reader clicks through to subscribe. It should never read like an ad for the newsletter — it should read like a great standalone post that happens to reveal there is more.
+
+Write three teaser options in plain prose. The first should lead with the insight itself — give away the headline finding and let the depth drive the click. The second should lead with a tension or paradox embedded in the issue — what the conventional wisdom gets wrong. The third should lead with a story hook that makes the topic personal. After each, write one sentence explaining the click-through mechanism. Then write the one-line subscribe call to action that follows the teaser — not "subscribe to my newsletter" but something specific to the value of {newsletter_name}.</pre>
+        <button class="copy-btn" onclick="copyPrompt(this)"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg> Copy</button>
+      </div>
+    </div>
+
+    <!-- CC-LI-001 -->
+    <div class="card" data-platform="li" data-section="prose" data-keywords="linkedin authority post ghostwriter industry personal story">
+      <div class="card-header">
+        <div class="platform-dot"></div>
+        <div class="card-title-group">
+          <div class="card-id">CC-LI-001 <span class="mode-badge mode-prose">Prose</span></div>
+          <div class="card-title">LinkedIn Authority Post</div>
+          <div class="card-vars">Variables: <span>{insight_or_lesson}</span> <span>{industry}</span> <span>{personal_story}</span> <span>{call_to_action}</span></div>
+        </div>
+        <span class="platform-tag">LinkedIn</span>
+      </div>
+      <div class="prompt-wrap">
+        <pre class="prompt-text">You are a ghostwriter for solo operators building authority on LinkedIn. A creator in the {industry} space wants to publish a post built around this insight: {insight_or_lesson}, grounded in this personal story: {personal_story}, closing with this call to action: {call_to_action}.
+
+Draft the post in plain prose, written in the creator's first-person voice. Open with a single short line that earns the "see more" click — specific, slightly counterintuitive, and never a question that sounds like a hook formula. Tell the story in compact paragraphs of one to three sentences each so the post breathes on a phone screen.
+
+Land the insight without preaching it. Close with the call to action phrased as an invitation rather than a demand. Aim for 150 to 300 words. Do not use emojis unless the creator's established voice already includes them. No bullet lists, no headers, no markdown — only well-spaced prose.</pre>
+        <button class="copy-btn" onclick="copyPrompt(this)">
+          <svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg>
+          Copy
+        </button>
+      </div>
+    </div>
+
+    <!-- CC-LI-002 -->
+    <div class="card" data-platform="li" data-section="prose" data-keywords="linkedin content strategy builder pillars posting plan authority" data-id="CC-LI-002">
+      <div class="card-header">
+        <div class="platform-dot"></div>
+        <div class="card-title-group">
+          <div class="card-id">CC-LI-002 <span class="mode-badge mode-prose">Prose</span></div>
+          <div class="card-title">LinkedIn Content Strategy Builder</div>
+          <div class="card-vars">Variables: <span>{industry}</span> <span>{target_audience}</span> <span>{business_goal}</span> <span>{posting_frequency}</span></div>
+        </div>
+        <span class="platform-tag">LinkedIn</span>
+      </div>
+      <div class="prompt-wrap">
+        <pre class="prompt-text">You are a LinkedIn strategist who builds content plans for solo operators who want to be known as the go-to voice in their space. A creator works in {industry}, targets {target_audience}, posts {posting_frequency} times per week, and wants their LinkedIn presence to drive {business_goal}.
+
+LinkedIn rewards a very specific content mode: professional insight that feels personal, delivered in short paragraphs that breathe on a phone screen, with a clear point of view that makes people feel the creator has something original to say.
+
+Write a content strategy in plain prose. Start by identifying the two or three content pillars that will build authority for this specific {target_audience} — not generic topics, but specific angles that this creator can own. For each pillar, describe the type of post it produces (personal story, industry take, how-to, contrarian argument, lessons from experience) and give a concrete example concept. Then describe the weekly posting rhythm: which pillar leads the week, which supports it, and which format appears when. Close with a paragraph on what one month of consistent posting should accomplish toward {business_goal}. No bullet points, no headers — continuous strategic prose.</pre>
+        <button class="copy-btn" onclick="copyPrompt(this)"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg> Copy</button>
+      </div>
+    </div>
+
+    <!-- CC-LI-003 -->
+    <div class="card" data-platform="li" data-section="prose" data-keywords="linkedin newsletter issue writer article long-form subscribers" data-id="CC-LI-003">
+      <div class="card-header">
+        <div class="platform-dot"></div>
+        <div class="card-title-group">
+          <div class="card-id">CC-LI-003 <span class="mode-badge mode-prose">Prose</span></div>
+          <div class="card-title">LinkedIn Newsletter Issue Writer</div>
+          <div class="card-vars">Variables: <span>{newsletter_name}</span> <span>{issue_topic}</span> <span>{target_audience}</span> <span>{creator_expertise}</span></div>
+        </div>
+        <span class="platform-tag">LinkedIn</span>
+      </div>
+      <div class="prompt-wrap">
+        <pre class="prompt-text">You are a ghostwriter for professionals who publish LinkedIn newsletters. The creator runs {newsletter_name} for {target_audience} and has expertise in {creator_expertise}. This issue covers {issue_topic}.
+
+LinkedIn newsletter issues work when they read like a smart colleague's thinking — not a formal article, not a blog post, but a clear-eyed take from someone who knows more than most and writes the way they talk. The ideal length is 400 to 700 words. Every paragraph should carry a distinct idea.
+
+Write the full issue in plain prose. Open with a hook that is specific to {issue_topic} — a surprising fact, a recent observation, a short scene — not a thesis statement. Move through the issue in a natural progression: the problem or context, the insight or framework, the implications for {target_audience}, and a concrete takeaway they can act on or think differently about. Close with a sentence that makes readers look forward to the next issue. Write in the creator's first-person voice. No headers, no bullet lists — continuous prose that feels like it was written for an audience of one.</pre>
+        <button class="copy-btn" onclick="copyPrompt(this)"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg> Copy</button>
+      </div>
+    </div>
+
+    <!-- CC-LI-004 -->
+    <div class="card" data-platform="li" data-section="prose" data-keywords="linkedin connection request outreach message dm personalized" data-id="CC-LI-004">
+      <div class="card-header">
+        <div class="platform-dot"></div>
+        <div class="card-title-group">
+          <div class="card-id">CC-LI-004 <span class="mode-badge mode-prose">Prose</span></div>
+          <div class="card-title">LinkedIn Connection Request & Outreach Writer</div>
+          <div class="card-vars">Variables: <span>{recipient_context}</span> <span>{shared_ground}</span> <span>{outreach_goal}</span> <span>{sender_context}</span></div>
+        </div>
+        <span class="platform-tag">LinkedIn</span>
+      </div>
+      <div class="prompt-wrap">
+        <pre class="prompt-text">You are a relationship strategist who helps professionals make meaningful first contact on LinkedIn without sounding like a pitch or a template. The sender is {sender_context}. The recipient is {recipient_context}. The shared ground is {shared_ground}. The goal of the outreach is {outreach_goal}.
+
+LinkedIn connection requests with a note get a 40% higher acceptance rate than blank requests. But most notes fail because they lead with the sender's agenda rather than a genuine reason for the connection. A good note leads with something specific about the recipient — a post they wrote, a role they hold, a perspective they shared — and arrives at the ask only after establishing genuine curiosity or shared context.
+
+Write three outreach options in plain prose. The first should lead with {shared_ground} and be warm but brief (under 200 characters — the connection request note limit). The second should be a slightly longer DM or InMail version (150 to 300 words) that opens with a specific observation about the recipient and works toward {outreach_goal} without hard-selling. The third should be a follow-up message if the connection is already established. After each, note in one sentence what makes it likely to get a response.</pre>
+        <button class="copy-btn" onclick="copyPrompt(this)"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg> Copy</button>
+      </div>
+    </div>
+
+    <!-- CC-LI-005 -->
+    <div class="card" data-platform="li" data-section="prose" data-keywords="linkedin about section writer bio summary profile storytelling" data-id="CC-LI-005">
+      <div class="card-header">
+        <div class="platform-dot"></div>
+        <div class="card-title-group">
+          <div class="card-id">CC-LI-005 <span class="mode-badge mode-prose">Prose</span></div>
+          <div class="card-title">LinkedIn About Section Writer</div>
+          <div class="card-vars">Variables: <span>{professional_background}</span> <span>{current_focus}</span> <span>{target_reader}</span> <span>{desired_outcome}</span></div>
+        </div>
+        <span class="platform-tag">LinkedIn</span>
+      </div>
+      <div class="prompt-wrap">
+        <pre class="prompt-text">You are a ghostwriter who writes LinkedIn About sections that read like a person, not a resume. The creator's background is {professional_background}, current focus is {current_focus}, the person reading the About section is {target_reader}, and the desired outcome is {desired_outcome}.
+
+The LinkedIn About section can hold up to 2,600 characters. Most people use it to list their experience in reverse order. The few who stand out use it to tell the story of why they do what they do — in a voice that makes {target_reader} feel like they're meeting a real person rather than scanning a CV.
+
+Write the About section in plain prose, in the creator's first-person voice. Open with a hook that reflects the creator's current focus or a core belief — not "I have been in [industry] for X years." Move through the narrative arc: what shaped their professional perspective, what they are building or focused on now, and what they offer to people like {target_reader}. Close with a short paragraph that makes the desired outcome of {desired_outcome} feel like a natural next step — not a call to action, a continuation of the story. Aim for 250 to 400 words.</pre>
+        <button class="copy-btn" onclick="copyPrompt(this)"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg> Copy</button>
+      </div>
+    </div>
+
+    <!-- CC-XP-001 -->
+    <div class="card" data-platform="xp" data-section="prose" data-keywords="cross-platform repurposer content systems multi-platform adaptation">
+      <div class="card-header">
+        <div class="platform-dot"></div>
+        <div class="card-title-group">
+          <div class="card-id">CC-XP-001 <span class="mode-badge mode-prose">Prose</span></div>
+          <div class="card-title">Cross-Platform Repurposer</div>
+          <div class="card-vars">Variables: <span>{source_content}</span> <span>{source_platform}</span> <span>{target_platforms}</span> <span>{creator_voice}</span></div>
+        </div>
+        <span class="platform-tag">All Platforms</span>
+      </div>
+      <div class="prompt-wrap">
+        <pre class="prompt-text">You are a content systems strategist who helps solo creators turn one strong piece of content into a coherent presence across multiple platforms. The source content is: {source_content}. It originally lived on {source_platform}. The creator wants to adapt it for {target_platforms} while preserving their voice, which can be described as {creator_voice}.
+
+For each target platform, write a short prose section that opens by naming the platform, then explains how you have rethought the content for that platform's native format, attention dynamics, and audience expectations. Then deliver the actual adapted draft — the post, caption, script, or thread — in plain prose, as the creator would publish it.
+
+Do not simply copy the source across platforms with minor edits. Each adaptation should feel like it was written for that platform first. No bullet points, no tables, no markdown — let the response read as one continuous strategic brief that flows from platform to platform.</pre>
+        <button class="copy-btn" onclick="copyPrompt(this)">
+          <svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg>
+          Copy
+        </button>
+      </div>
+    </div>
+
+    <!-- CC-XP-002 -->
+    <div class="card" data-platform="xp" data-section="prose" data-keywords="content pillar strategy builder topics authority themes creator" data-id="CC-XP-002">
+      <div class="card-header">
+        <div class="platform-dot"></div>
+        <div class="card-title-group">
+          <div class="card-id">CC-XP-002 <span class="mode-badge mode-prose">Prose</span></div>
+          <div class="card-title">Content Pillar Strategy Builder</div>
+          <div class="card-vars">Variables: <span>{creator_expertise}</span> <span>{target_audience}</span> <span>{platforms}</span> <span>{long_term_goal}</span></div>
+        </div>
+        <span class="platform-tag">All Platforms</span>
+      </div>
+      <div class="prompt-wrap">
+        <pre class="prompt-text">You are a content strategist who helps solo creators build a coherent cross-platform identity through content pillars — the recurring themes that give a creator's output focus, recognizability, and authority over time. The creator has expertise in {creator_expertise}, targets {target_audience}, publishes on {platforms}, and wants their content to ultimately achieve {long_term_goal}.
+
+Content pillars serve two functions at once: they give the creator a repeatable framework for generating ideas without starting from zero every time, and they give the audience a reliable expectation of what following this creator means. The right pillars are neither too broad (lifestyle) nor too narrow (one tactical topic) — they are specific enough to own but wide enough to sustain.
+
+Design a pillar strategy in plain prose. Begin by identifying the two to four pillars that best serve both {creator_expertise} and {target_audience}'s actual needs. For each pillar, write a short paragraph naming the theme, explaining why it is strategically right for this creator at this moment, describing what content it produces, and giving a concrete example for each platform in {platforms}. Close with a paragraph on how the pillars reinforce each other across platforms — the ecosystem effect that makes a creator feel cohesive rather than scattered.</pre>
+        <button class="copy-btn" onclick="copyPrompt(this)"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg> Copy</button>
+      </div>
+    </div>
+
+    <!-- CC-XP-003 -->
+    <div class="card" data-platform="xp" data-section="prose" data-keywords="weekly content batch planner recording session efficiency output" data-id="CC-XP-003">
+      <div class="card-header">
+        <div class="platform-dot"></div>
+        <div class="card-title-group">
+          <div class="card-id">CC-XP-003 <span class="mode-badge mode-prose">Prose</span></div>
+          <div class="card-title">Weekly Content Batch Planner</div>
+          <div class="card-vars">Variables: <span>{platforms}</span> <span>{weekly_output_targets}</span> <span>{content_pillars}</span> <span>{available_recording_time}</span></div>
+        </div>
+        <span class="platform-tag">All Platforms</span>
+      </div>
+      <div class="prompt-wrap">
+        <pre class="prompt-text">You are a content operations strategist who helps solo creators produce more by working smarter, not longer. The creator publishes on {platforms}, aims to produce {weekly_output_targets} pieces per week, works within these content pillars: {content_pillars}, and has {available_recording_time} available for creation each week.
+
+Batching — recording or writing multiple pieces in one session — is the highest-leverage habit a solo creator can build. Done well, it removes decision fatigue, creates consistent quality across the week, and frees the creator from daily production pressure.
+
+Design a concrete weekly batch plan in plain prose. Start by explaining how to structure the recording block given {available_recording_time} — what to produce first, in what order, and why. Then walk through the specific pieces to produce in this week's batch: for each platform in {platforms}, name the content concept (tied to {content_pillars}), the format, and any dependencies (for example, a YouTube video that gets clipped for TikTok). Close with a short paragraph on how to handle the editing and scheduling workflow so that the batch becomes published content by end of week. No bullet points — a readable production brief.</pre>
+        <button class="copy-btn" onclick="copyPrompt(this)"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg> Copy</button>
+      </div>
+    </div>
+
+    <!-- CC-XP-004 -->
+    <div class="card" data-platform="xp" data-section="prose" data-keywords="brand voice style guide writer tone consistency creator identity" data-id="CC-XP-004">
+      <div class="card-header">
+        <div class="platform-dot"></div>
+        <div class="card-title-group">
+          <div class="card-id">CC-XP-004 <span class="mode-badge mode-prose">Prose</span></div>
+          <div class="card-title">Brand Voice & Style Guide Writer</div>
+          <div class="card-vars">Variables: <span>{creator_name}</span> <span>{niche}</span> <span>{content_examples}</span> <span>{platforms}</span></div>
+        </div>
+        <span class="platform-tag">All Platforms</span>
+      </div>
+      <div class="prompt-wrap">
+        <pre class="prompt-text">You are a brand voice strategist who distills a creator's natural way of communicating into a reference document they can use to stay consistent across platforms, collaborate with editors, or brief AI tools. The creator is {creator_name}, working in {niche}, publishing on {platforms}. Their existing content examples are: {content_examples}.
+
+A brand voice guide is not a list of adjectives. It is a practical reference that captures how the creator actually thinks and communicates — the specific patterns, rhythms, word choices, and attitudes that make their content recognizable to a returning reader.
+
+Read the content examples and write a voice guide in plain prose. Describe the creator's voice in terms of concrete, observable patterns: sentence length and rhythm, use of humor or restraint, how they handle expertise (do they teach down, talk across, or challenge up?), which words they favor and which they avoid, how they open and close content, and how their voice adapts across {platforms} while staying recognizably theirs. After the descriptive sections, write ten example phrases or sentences that sound exactly like this creator — and ten that would sound wrong. Frame the entire guide as instructions a ghostwriter or editor could follow without guessing.</pre>
+        <button class="copy-btn" onclick="copyPrompt(this)"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg> Copy</button>
+      </div>
+    </div>
+
+    <!-- CC-XP-005 -->
+    <div class="card" data-platform="xp" data-section="prose" data-keywords="content audit gap identifier library analysis missing opportunities" data-id="CC-XP-005">
+      <div class="card-header">
+        <div class="platform-dot"></div>
+        <div class="card-title-group">
+          <div class="card-id">CC-XP-005 <span class="mode-badge mode-prose">Prose</span></div>
+          <div class="card-title">Content Audit & Gap Identifier</div>
+          <div class="card-vars">Variables: <span>{existing_content_summary}</span> <span>{platforms}</span> <span>{target_audience}</span> <span>{growth_goal}</span></div>
+        </div>
+        <span class="platform-tag">All Platforms</span>
+      </div>
+      <div class="prompt-wrap">
+        <pre class="prompt-text">You are a content strategist who audits creator libraries to find what is missing, overrepresented, or misaligned with growth goals. A creator publishes on {platforms} for {target_audience} and wants to achieve {growth_goal}. Their existing content can be summarized as: {existing_content_summary}.
+
+A content audit is worth doing when a creator feels busy but stuck — producing content consistently without seeing the growth they expect. The gap between effort and result usually lives in three places: topic coverage that does not match what the audience actually searches for or needs, format imbalance where one type of post dominates while others that could drive discovery are missing, or platform mismatch where the content is well-suited to the creator but not to how the platform actually surfaces content to new viewers.
+
+Audit the existing content against these three dimensions in plain prose. For each dimension, describe what the existing content does well, where the gap is, and what specific content the creator should produce to close it — not vague advice, but concrete topic concepts mapped to {platforms} and tied to {growth_goal}. Close with a priority order: which gap to close first and why it will have the highest leverage.</pre>
+        <button class="copy-btn" onclick="copyPrompt(this)"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg> Copy</button>
+      </div>
+    </div>
+
+  </div><!-- /grid-prose -->
+
+  <div class="section-label" data-section="list">Section B — List Variants</div>
+  <div class="grid" id="grid-list">
+
+    <!-- CC-YT-001b -->
+    <div class="card" data-platform="yt" data-section="list" data-keywords="youtube video idea generator list structured niche audience">
+      <div class="card-header">
+        <div class="platform-dot"></div>
+        <div class="card-title-group">
+          <div class="card-id">CC-YT-001b <span class="mode-badge mode-list">List</span></div>
+          <div class="card-title">Video Idea Generator (List)</div>
+          <div class="card-vars">Variables: <span>{niche}</span> <span>{audience}</span> <span>{channel_goal}</span> <span>{desired_count}</span></div>
+        </div>
+        <span class="platform-tag">YouTube</span>
+      </div>
+      <div class="prompt-wrap">
+        <pre class="prompt-text">You are a senior YouTube strategist who has helped solo creators in the {niche} space grow from zero to engaged audiences. Generate {desired_count} fresh video ideas tailored to a creator whose audience is {audience} and whose channel goal is {channel_goal}.
+
+Before generating, briefly consider what this audience is currently struggling with, what they search for, and where existing videos in the niche underdeliver. Then produce ideas that combine proven YouTube formats — tutorials, reactions, case studies, story essays, comparisons, "I tried X for Y days," teardowns, contrarian takes — with the creator's unique angle.
+
+Output as a numbered list. Each entry must include, on separate labeled lines:
+- Title: the working video title
+- Format: the structural format
+- Hook: the underlying angle in one sentence
+- Why it works: one sentence on why this audience will respond
+
+Avoid generic clickbait premises and overdone niche topics. Favor specificity, novelty, and a clear emotional or intellectual hook.</pre>
+        <button class="copy-btn" onclick="copyPrompt(this)">
+          <svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg>
+          Copy
+        </button>
+      </div>
+    </div>
+
+    <!-- CC-YT-002b -->
+    <div class="card" data-platform="yt" data-section="list" data-keywords="youtube title hook optimizer list scannable">
+      <div class="card-header">
+        <div class="platform-dot"></div>
+        <div class="card-title-group">
+          <div class="card-id">CC-YT-002b <span class="mode-badge mode-list">List</span></div>
+          <div class="card-title">Title & Hook Optimizer (List)</div>
+          <div class="card-vars">Variables: <span>{video_topic}</span> <span>{target_emotion}</span> <span>{channel_voice}</span></div>
+        </div>
+        <span class="platform-tag">YouTube</span>
+      </div>
+      <div class="prompt-wrap">
+        <pre class="prompt-text">You are a YouTube title writer with a track record of doubling click-through rates without resorting to clickbait. A creator is working on a video about {video_topic}, aiming to evoke {target_emotion}, and their channel voice is {channel_voice}.
+
+Produce ten title candidates as a numbered list. For each entry, provide on separate lines:
+- Title (under sixty characters where possible)
+- Opening Hook (the first spoken sentence of the video)
+- Lever (the psychological mechanism: curiosity gap, contrarian, specific number, identity, urgency, or novelty)
+
+Match the creator's voice rather than defaulting to a generic YouTube-guru cadence. Keep entries scannable so the creator can pick favorites at a glance.</pre>
+        <button class="copy-btn" onclick="copyPrompt(this)">
+          <svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg>
+          Copy
+        </button>
+      </div>
+    </div>
+
+    <!-- CC-YT-003b -->
+    <div class="card" data-platform="yt" data-section="list" data-keywords="youtube script outline builder list timestamps retention acts">
+      <div class="card-header">
+        <div class="platform-dot"></div>
+        <div class="card-title-group">
+          <div class="card-id">CC-YT-003b <span class="mode-badge mode-list">List</span></div>
+          <div class="card-title">Script Outline Builder (List)</div>
+          <div class="card-vars">Variables: <span>{video_topic}</span> <span>{audience_pain_point}</span> <span>{video_length}</span></div>
+        </div>
+        <span class="platform-tag">YouTube</span>
+      </div>
+      <div class="prompt-wrap">
+        <pre class="prompt-text">You are a video scriptwriter who specializes in retention. A creator is making a video about {video_topic}, targeted at viewers experiencing {audience_pain_point}, with a target length of {video_length}.
+
+Output a structured outline with the following labeled sections, each followed by bullet points:
+
+The Promise — one bullet stating the single takeaway the video must deliver.
+Cold Open (0:00–0:30) — bullets describing what's on screen and what the creator says.
+Act 1 — Setup — bullets for each beat.
+Act 2 — Build — bullets for each beat, including the mid-roll re-hook.
+Act 3 — Payoff — bullets for the climax and resolution.
+Outro & CTA — bullets for the close.
+Retention Risks — two or three bullets identifying drop-off points and the countermeasure for each.
+
+Bullets should be concrete enough to record from. Include rough timestamps where useful.</pre>
+        <button class="copy-btn" onclick="copyPrompt(this)">
+          <svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg>
+          Copy
+        </button>
+      </div>
+    </div>
+
+    <!-- CC-YT-004b -->
+    <div class="card" data-platform="yt" data-section="list" data-keywords="youtube description tags seo optimizer metadata list structured" data-id="CC-YT-004b">
+      <div class="card-header">
+        <div class="platform-dot"></div>
+        <div class="card-title-group">
+          <div class="card-id">CC-YT-004b <span class="mode-badge mode-list">List</span></div>
+          <div class="card-title">Description & Tags Optimizer (List)</div>
+          <div class="card-vars">Variables: <span>{video_title}</span> <span>{video_summary}</span> <span>{target_keywords}</span> <span>{channel_niche}</span></div>
+        </div>
+        <span class="platform-tag">YouTube</span>
+      </div>
+      <div class="prompt-wrap">
+        <pre class="prompt-text">You are a YouTube SEO specialist. A creator in {channel_niche} has a video titled "{video_title}" covering: {video_summary}. Target keywords: {target_keywords}.
+
+Output in three labeled sections:
+
+Description (ready to paste):
+- Hook paragraph (2–3 sentences that earn a human reader's attention without keyword-stuffing)
+- SEO paragraph (naturally works in target keywords and related terms while remaining readable)
+- Footer paragraph (timestamps if applicable, standard links, subscribe prompt in creator voice)
+
+Tags (comma-separated, 20–30 tags ordered most-specific to most-broad):
+[tag list here]
+
+Tag Strategy Note (one sentence explaining the ordering logic and which tag cluster is expected to perform best):
+
+Each section should be usable without editing. The description should read as a human wrote it, not an SEO tool.</pre>
+        <button class="copy-btn" onclick="copyPrompt(this)"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg> Copy</button>
+      </div>
+    </div>
+
+    <!-- CC-YT-005b -->
+    <div class="card" data-platform="yt" data-section="list" data-keywords="youtube channel trailer script list beat shot subscribe convert" data-id="CC-YT-005b">
+      <div class="card-header">
+        <div class="platform-dot"></div>
+        <div class="card-title-group">
+          <div class="card-id">CC-YT-005b <span class="mode-badge mode-list">List</span></div>
+          <div class="card-title">Channel Trailer Script (List)</div>
+          <div class="card-vars">Variables: <span>{channel_niche}</span> <span>{target_audience}</span> <span>{creator_name}</span> <span>{unique_value_proposition}</span></div>
+        </div>
+        <span class="platform-tag">YouTube</span>
+      </div>
+      <div class="prompt-wrap">
+        <pre class="prompt-text">You are a channel strategist writing a trailer script for {creator_name}'s channel in {channel_niche}, targeting {target_audience}, with this unique value proposition: {unique_value_proposition}.
+
+Output a structured beat sheet for a 60–90 second trailer. For each beat include:
+- Beat # and timestamp range
+- On-screen visual (what the camera shows or what B-roll appears)
+- Spoken line (verbatim, as the creator would say it)
+- Function (hook / value proof / audience address / subscribe ask)
+
+Beat requirements:
+- Beat 1: Opens by speaking directly to a specific viewer situation or desire — not "Welcome to my channel"
+- Beats 2–4: One to two concrete examples of what the viewer gains from subscribing
+- Final beat: Subscribe ask that feels earned — specific to the value proposition, not generic
+
+After the beat sheet, include a single line labeled "Thumbnail text:" with the 3–5 words that would appear on the trailer's thumbnail card to maximize click-through from the channel page.</pre>
+        <button class="copy-btn" onclick="copyPrompt(this)"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg> Copy</button>
+      </div>
+    </div>
+
+    <!-- CC-IG-001b -->
+    <div class="card" data-platform="ig" data-section="list" data-keywords="instagram carousel architect list slide breakdown role visual">
+      <div class="card-header">
+        <div class="platform-dot"></div>
+        <div class="card-title-group">
+          <div class="card-id">CC-IG-001b <span class="mode-badge mode-list">List</span></div>
+          <div class="card-title">Carousel Architect (List)</div>
+          <div class="card-vars">Variables: <span>{topic}</span> <span>{audience}</span> <span>{slide_count}</span> <span>{brand_voice}</span></div>
+        </div>
+        <span class="platform-tag">Instagram</span>
+      </div>
+      <div class="prompt-wrap">
+        <pre class="prompt-text">You are an Instagram content designer who builds save-worthy educational carousels. A creator with a {brand_voice} voice wants to publish a {slide_count}-slide carousel on {topic} for an audience of {audience}.
+
+Output a numbered slide-by-slide breakdown. For each slide, provide on separate labeled lines:
+- Slide #
+- Role (hook, problem, reframe, framework, example, recap, or CTA)
+- On-image text (five to twelve words)
+- Visual concept (layout, imagery, design treatment)
+- Speaker note (optional, for the creator's reference)
+
+Open with a hook slide that creates an open loop. End with a save-or-share-worthy payoff and a clear CTA. Each middle slide must carry one discrete insight, never a restatement of the prior slide.</pre>
+        <button class="copy-btn" onclick="copyPrompt(this)">
+          <svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg>
+          Copy
+        </button>
+      </div>
+    </div>
+
+    <!-- CC-IG-002b -->
+    <div class="card" data-platform="ig" data-section="list" data-keywords="instagram reel hook generator list mechanism visual cue">
+      <div class="card-header">
+        <div class="platform-dot"></div>
+        <div class="card-title-group">
+          <div class="card-id">CC-IG-002b <span class="mode-badge mode-list">List</span></div>
+          <div class="card-title">Reel Hook Generator (List)</div>
+          <div class="card-vars">Variables: <span>{topic}</span> <span>{pattern_interrupt_style}</span> <span>{desired_emotion}</span></div>
+        </div>
+        <span class="platform-tag">Instagram</span>
+      </div>
+      <div class="prompt-wrap">
+        <pre class="prompt-text">You are a short-form video hook writer who studies what makes viewers stop scrolling in the first two seconds. A creator is making a Reel about {topic} and wants the opening to use a {pattern_interrupt_style} approach while making the viewer feel {desired_emotion}.
+
+Output twelve hooks as a numbered list. For each, include on separate lines:
+- Hook (spoken in three seconds or less, written the way the creator would say it)
+- Mechanism (why a viewer's thumb stops)
+- Visual cue (what's on camera in the opening frame, if it matters)
+
+Vary approaches across curiosity, contrarian claims, specific numbers, raw confession, visual setup, dialogue snippets, and direct address. Avoid worn formulas like "Did you know" or "Stop what you're doing."</pre>
+        <button class="copy-btn" onclick="copyPrompt(this)">
+          <svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg>
+          Copy
+        </button>
+      </div>
+    </div>
+
+    <!-- CC-IG-003b -->
+    <div class="card" data-platform="ig" data-section="list" data-keywords="instagram bio profile optimizer list versions angle conversion" data-id="CC-IG-003b">
+      <div class="card-header">
+        <div class="platform-dot"></div>
+        <div class="card-title-group">
+          <div class="card-id">CC-IG-003b <span class="mode-badge mode-list">List</span></div>
+          <div class="card-title">Instagram Bio & Profile Optimizer (List)</div>
+          <div class="card-vars">Variables: <span>{creator_niche}</span> <span>{target_audience}</span> <span>{creator_name}</span> <span>{main_offer_or_goal}</span></div>
+        </div>
+        <span class="platform-tag">Instagram</span>
+      </div>
+      <div class="prompt-wrap">
+        <pre class="prompt-text">You are an Instagram profile strategist. Creator: {creator_name}, niche: {creator_niche}, audience: {target_audience}, goal: {main_offer_or_goal}.
+
+Output in four labeled sections:
+
+Primary Bio (max 150 characters, ready to paste):
+[bio text]
+
+Word Choice Rationale (one bullet per key phrase explaining why it was chosen):
+- [phrase]: [reason]
+
+Alternative Bio A — Audience Outcome angle (max 150 characters):
+[bio text]
+
+Alternative Bio B — Creator Authority angle (max 150 characters):
+[bio text]
+
+For each bio also provide:
+- Link anchor text: the 4–8 word clickable label for the link-in-bio pointing to {main_offer_or_goal}
+- Missing element (if any): what the bio sacrifices to hit the character limit and whether it matters</pre>
+        <button class="copy-btn" onclick="copyPrompt(this)"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg> Copy</button>
+      </div>
+    </div>
+
+    <!-- CC-IG-004b -->
+    <div class="card" data-platform="ig" data-section="list" data-keywords="instagram story sequence planner list frame breakdown sticker poll" data-id="CC-IG-004b">
+      <div class="card-header">
+        <div class="platform-dot"></div>
+        <div class="card-title-group">
+          <div class="card-id">CC-IG-004b <span class="mode-badge mode-list">List</span></div>
+          <div class="card-title">Story Sequence Planner (List)</div>
+          <div class="card-vars">Variables: <span>{story_goal}</span> <span>{audience}</span> <span>{num_stories}</span> <span>{brand_voice}</span></div>
+        </div>
+        <span class="platform-tag">Instagram</span>
+      </div>
+      <div class="prompt-wrap">
+        <pre class="prompt-text">You are an Instagram Stories strategist. Creator voice: {brand_voice}. Audience: {audience}. Number of stories: {num_stories}. Goal: {story_goal}.
+
+Output a numbered story-by-story breakdown. For each story include:
+- Story #
+- Frame type (text-only, photo, video, boomerang, interactive)
+- On-screen text or spoken content (max 2 lines — Stories are fast)
+- Interactive element (poll / question box / quiz / link sticker / none — and the exact prompt text if used)
+- Tap-forward hook (what makes the viewer tap to the next story rather than skipping)
+
+Story arc requirements:
+- Story 1: Pattern interrupt — something that stops a mindless tap-through
+- Stories 2 to N-1: One idea per frame, building toward the goal
+- Story N: Payoff frame that delivers on {story_goal} and includes a clear next step
+
+After the list, include a one-line "Re-share prompt:" — the text overlay to use if reposting this sequence to a Highlight.</pre>
+        <button class="copy-btn" onclick="copyPrompt(this)"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg> Copy</button>
+      </div>
+    </div>
+
+    <!-- CC-IG-005b -->
+    <div class="card" data-platform="ig" data-section="list" data-keywords="instagram caption writer list structured hook body cta hashtag" data-id="CC-IG-005b">
+      <div class="card-header">
+        <div class="platform-dot"></div>
+        <div class="card-title-group">
+          <div class="card-id">CC-IG-005b <span class="mode-badge mode-list">List</span></div>
+          <div class="card-title">Single-Image Caption Writer (List)</div>
+          <div class="card-vars">Variables: <span>{image_description}</span> <span>{topic}</span> <span>{audience}</span> <span>{desired_action}</span></div>
+        </div>
+        <span class="platform-tag">Instagram</span>
+      </div>
+      <div class="prompt-wrap">
+        <pre class="prompt-text">You are a caption writer. Image shows: {image_description}. Topic: {topic}. Audience: {audience}. Desired action: {desired_action}.
+
+Output in four labeled sections:
+
+Caption (ready to paste — no markdown, line breaks as they would appear in the app):
+Hook line: [single line, extends or deepens image — does not describe it]
+Body: [2–4 short paragraphs, one idea each, building toward the action]
+Close: [natural invitation toward {desired_action} — not a command]
+
+Hook Rationale (one sentence explaining why this hook stops the scroll for {audience}):
+
+Hashtag Clusters (three groups of 5–8 tags — each on its own labeled line):
+Niche-specific: #tag #tag #tag …
+Topic-broad: #tag #tag #tag …
+Discovery: #tag #tag #tag …
+
+Alt Hook (one alternative opening line if the primary feels too safe):</pre>
+        <button class="copy-btn" onclick="copyPrompt(this)"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg> Copy</button>
+      </div>
+    </div>
+
+    <!-- CC-TT-001b -->
+    <div class="card" data-platform="tt" data-section="list" data-keywords="tiktok trend adapter list format diagnosis shot list production">
+      <div class="card-header">
+        <div class="platform-dot"></div>
+        <div class="card-title-group">
+          <div class="card-id">CC-TT-001b <span class="mode-badge mode-list">List</span></div>
+          <div class="card-title">Trend Adapter (List)</div>
+          <div class="card-vars">Variables: <span>{trending_format}</span> <span>{creator_niche}</span> <span>{core_message}</span></div>
+        </div>
+        <span class="platform-tag">TikTok</span>
+      </div>
+      <div class="prompt-wrap">
+        <pre class="prompt-text">You are a TikTok strategist fluent in the platform's evolving native formats. A creator working in the {creator_niche} space wants to ride the {trending_format} format while delivering this core message: {core_message}.
+
+Output in three labeled sections:
+
+Format Diagnosis:
+- Tempo:
+- On-screen conventions:
+- Audio or visual signature:
+- Why it currently performs:
+- Fit assessment (does the message suit this format, or should an alternative be proposed):
+
+Adapted Script (under sixty seconds): a numbered shot list. For each beat:
+- Time (e.g., 0:00–0:03)
+- Camera (what's on screen)
+- Spoken line (verbatim)
+- Overlay text (if any)
+- Audio cue
+
+Production Notes:
+- Sound choice:
+- Wardrobe or setting notes:
+- Anything that must be filmed in one take:
+
+If the format genuinely doesn't fit the message, say so in the Fit Assessment and propose the closest viable alternative before scripting.</pre>
+        <button class="copy-btn" onclick="copyPrompt(this)">
+          <svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg>
+          Copy
+        </button>
+      </div>
+    </div>
+
+    <!-- CC-TT-002b -->
+    <div class="card" data-platform="tt" data-section="list" data-keywords="tiktok story hook list beat sheet timestamp director note">
+      <div class="card-header">
+        <div class="platform-dot"></div>
+        <div class="card-title-group">
+          <div class="card-id">CC-TT-002b <span class="mode-badge mode-list">List</span></div>
+          <div class="card-title">Story Hook (List)</div>
+          <div class="card-vars">Variables: <span>{personal_anecdote}</span> <span>{lesson}</span> <span>{audience}</span></div>
+        </div>
+        <span class="platform-tag">TikTok</span>
+      </div>
+      <div class="prompt-wrap">
+        <pre class="prompt-text">You are a storytelling coach who helps solo creators turn lived experience into TikTok videos that hold attention. The anecdote is: {personal_anecdote}. The lesson is: {lesson}. The audience is: {audience}.
+
+Output a beat sheet for a forty-five to seventy-five second video as a numbered list of beats. For each beat, include:
+- Beat # and approximate timestamp
+- Spoken line (verbatim, the way the creator should say it)
+- Camera or B-roll cue
+- Tone (urgent, deadpan, vulnerable, etc.)
+
+The opening beat must drop the viewer mid-tension. The resolution must be withheld until the final beat. The lesson should emerge from the story rather than be stated as a moral. After the beat list, add a short labeled "Director's Note" with anything the creator should keep in mind during recording.</pre>
+        <button class="copy-btn" onclick="copyPrompt(this)">
+          <svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg>
+          Copy
+        </button>
+      </div>
+    </div>
+
+    <!-- CC-TT-003b -->
+    <div class="card" data-platform="tt" data-section="list" data-keywords="tiktok content calendar list weekly plan pillar batch schedule" data-id="CC-TT-003b">
+      <div class="card-header">
+        <div class="platform-dot"></div>
+        <div class="card-title-group">
+          <div class="card-id">CC-TT-003b <span class="mode-badge mode-list">List</span></div>
+          <div class="card-title">Content Calendar Builder (List)</div>
+          <div class="card-vars">Variables: <span>{creator_niche}</span> <span>{posting_frequency}</span> <span>{content_pillars}</span> <span>{period}</span></div>
+        </div>
+        <span class="platform-tag">TikTok</span>
+      </div>
+      <div class="prompt-wrap">
+        <pre class="prompt-text">You are a TikTok content strategist. Niche: {creator_niche}. Posting frequency: {posting_frequency}/week. Pillars: {content_pillars}. Period: {period}.
+
+Output a week-by-week calendar as a structured list. For each week include:
+
+Week [#] — [theme or strategic focus for the week]
+For each post that week:
+- Post #: [concept title]
+- Pillar: [which content pillar]
+- Format: [talking head / duet / trend / tutorial / storytime / text overlay / etc.]
+- Hook: [the opening line or visual]
+- Discovery angle: [why this has reach potential beyond existing followers]
+
+After the full calendar, include two labeled sections:
+
+Batch Session Plan (which posts to record together and why):
+
+Trending Opportunity (one format or sound to monitor during {period} that could boost one post's reach if timed right):</pre>
+        <button class="copy-btn" onclick="copyPrompt(this)"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg> Copy</button>
+      </div>
+    </div>
+
+    <!-- CC-TT-004b -->
+    <div class="card" data-platform="tt" data-section="list" data-keywords="tiktok comment reply list options approach mechanism community" data-id="CC-TT-004b">
+      <div class="card-header">
+        <div class="platform-dot"></div>
+        <div class="card-title-group">
+          <div class="card-id">CC-TT-004b <span class="mode-badge mode-list">List</span></div>
+          <div class="card-title">Comment & Community Reply Writer (List)</div>
+          <div class="card-vars">Variables: <span>{original_video_topic}</span> <span>{comment_text}</span> <span>{creator_voice}</span></div>
+        </div>
+        <span class="platform-tag">TikTok</span>
+      </div>
+      <div class="prompt-wrap">
+        <pre class="prompt-text">You are a community strategist. Video topic: {original_video_topic}. Comment: "{comment_text}". Creator voice: {creator_voice}.
+
+Output in three labeled sections:
+
+Comment Type Analysis:
+- Type: [question / disagreement / emotional response / praise / challenge / content idea]
+- Strategic value: [one sentence on what this comment represents for the creator's community]
+- Risk if ignored: [one sentence]
+
+Reply Options (three numbered options, each under 150 characters):
+1. [Reply] — Approach: [direct answer] — Goal: [invite follow-up]
+2. [Reply] — Approach: [validate + deepen] — Goal: [build relationship]
+3. [Reply] — Approach: [tease future video] — Goal: [drive return views]
+
+Recommendation:
+- Best reply: [#]
+- Reason: [one sentence]
+- Video response opportunity: [yes/no — if yes, one-sentence concept for a video reply]</pre>
+        <button class="copy-btn" onclick="copyPrompt(this)"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg> Copy</button>
+      </div>
+    </div>
+
+    <!-- CC-TT-005b -->
+    <div class="card" data-platform="tt" data-section="list" data-keywords="tiktok bio link optimizer list versions angle anchor text" data-id="CC-TT-005b">
+      <div class="card-header">
+        <div class="platform-dot"></div>
+        <div class="card-title-group">
+          <div class="card-id">CC-TT-005b <span class="mode-badge mode-list">List</span></div>
+          <div class="card-title">Bio & Link Optimizer (List)</div>
+          <div class="card-vars">Variables: <span>{creator_niche}</span> <span>{target_audience}</span> <span>{primary_cta}</span> <span>{link_destination}</span></div>
+        </div>
+        <span class="platform-tag">TikTok</span>
+      </div>
+      <div class="prompt-wrap">
+        <pre class="prompt-text">You are a TikTok profile strategist. Niche: {creator_niche}. Audience: {target_audience}. CTA: {primary_cta}. Link: {link_destination}.
+
+Output in four labeled sections:
+
+Primary Bio (max 80 characters, ready to paste):
+[bio text]
+
+Word Choice Breakdown (one bullet per key decision):
+- [word/phrase]: [why it was chosen over alternatives]
+
+Alternative Bio A — Identity-led (max 80 characters):
+[bio text]
+Link anchor: [4–8 words for the clickable link label]
+
+Alternative Bio B — Outcome-led (max 80 characters):
+[bio text]
+Link anchor: [4–8 words for the clickable link label]
+
+Avoided Words (two to three words or phrases that were considered and rejected, with one-word reason for each):
+- [word]: [reason]</pre>
+        <button class="copy-btn" onclick="copyPrompt(this)"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg> Copy</button>
+      </div>
+    </div>
+
+    <!-- CC-X-001b -->
+    <div class="card" data-platform="x" data-section="list" data-keywords="x twitter thread builder list through-line post role close">
+      <div class="card-header">
+        <div class="platform-dot"></div>
+        <div class="card-title-group">
+          <div class="card-id">CC-X-001b <span class="mode-badge mode-list">List</span></div>
+          <div class="card-title">Thread Builder (List)</div>
+          <div class="card-vars">Variables: <span>{topic}</span> <span>{thread_purpose}</span> <span>{evidence_or_examples}</span> <span>{desired_length}</span></div>
+        </div>
+        <span class="platform-tag">X</span>
+      </div>
+      <div class="prompt-wrap">
+        <pre class="prompt-text">You are a long-time X writer who builds threads that get bookmarked and re-read. A creator wants to write a thread on {topic} for the purpose of {thread_purpose}, drawing on these examples or evidence: {evidence_or_examples}. Desired length is roughly {desired_length} posts.
+
+Begin with a single line labeled "Through-line:" stating the central claim the thread defends.
+
+Then output the thread as a numbered post list. Each post must be under 280 characters. For each entry:
+- Post #
+- Text (the actual post copy)
+- Role (hook, argument, example, transition, or close)
+
+After the list, include a single line labeled "Next-step prompt:" describing the one action the final post invites readers to take. Never stack multiple ideas in a single post — split if needed.</pre>
+        <button class="copy-btn" onclick="copyPrompt(this)">
+          <svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg>
+          Copy
+        </button>
+      </div>
+    </div>
+
+    <!-- CC-X-002b -->
+    <div class="card" data-platform="x" data-section="list" data-keywords="x twitter profile bio optimizer list pinned post versions" data-id="CC-X-002b">
+      <div class="card-header">
+        <div class="platform-dot"></div>
+        <div class="card-title-group">
+          <div class="card-id">CC-X-002b <span class="mode-badge mode-list">List</span></div>
+          <div class="card-title">X Profile & Bio Optimizer (List)</div>
+          <div class="card-vars">Variables: <span>{creator_focus}</span> <span>{target_audience}</span> <span>{posting_style}</span> <span>{main_offer_or_goal}</span></div>
+        </div>
+        <span class="platform-tag">X</span>
+      </div>
+      <div class="prompt-wrap">
+        <pre class="prompt-text">You are an X profile strategist. Focus: {creator_focus}. Audience: {target_audience}. Posting style: {posting_style}. Goal: {main_offer_or_goal}.
+
+Output in four labeled sections:
+
+Primary Bio (max 160 characters, ready to paste):
+[bio text]
+
+Bio Breakdown (one bullet per phrase explaining why it earns a follow):
+- [phrase]: [rationale]
+
+Pinned Post (under 280 characters — the first post a new follower sees):
+[post text]
+Why this pinned post: [one sentence]
+
+Alternative Bio (second approach — lead with a different angle):
+[bio text]
+Key difference: [one sentence on how this angle serves a different reader motivation]</pre>
+        <button class="copy-btn" onclick="copyPrompt(this)"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg> Copy</button>
+      </div>
+    </div>
+
+    <!-- CC-X-003b -->
+    <div class="card" data-platform="x" data-section="list" data-keywords="x twitter engagement reply list options approach mechanism" data-id="CC-X-003b">
+      <div class="card-header">
+        <div class="platform-dot"></div>
+        <div class="card-title-group">
+          <div class="card-id">CC-X-003b <span class="mode-badge mode-list">List</span></div>
+          <div class="card-title">Engagement & Reply Writer (List)</div>
+          <div class="card-vars">Variables: <span>{original_post}</span> <span>{post_author_context}</span> <span>{creator_voice}</span> <span>{engagement_goal}</span></div>
+        </div>
+        <span class="platform-tag">X</span>
+      </div>
+      <div class="prompt-wrap">
+        <pre class="prompt-text">You are an X strategist. Original post: "{original_post}". Author context: {post_author_context}. Creator voice: {creator_voice}. Goal: {engagement_goal}.
+
+Output in two labeled sections:
+
+Reply Options (five numbered entries, each under 280 characters):
+1. [Reply text] | Approach: add angle | Mechanism: [one phrase]
+2. [Reply text] | Approach: extend story | Mechanism: [one phrase]
+3. [Reply text] | Approach: respectful disagree | Mechanism: [one phrase]
+4. [Reply text] | Approach: sharp question | Mechanism: [one phrase]
+5. [Reply text] | Approach: [creator's choice] | Mechanism: [one phrase]
+
+Recommendation:
+- Send: Reply #[N]
+- Reason: [one sentence on why this serves {engagement_goal} best]
+- Avoid: [one word or phrase from any rejected reply that would undermine the creator's voice]</pre>
+        <button class="copy-btn" onclick="copyPrompt(this)"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg> Copy</button>
+      </div>
+    </div>
+
+    <!-- CC-X-004b -->
+    <div class="card" data-platform="x" data-section="list" data-keywords="x twitter content pillar strategy list topics weekly cadence" data-id="CC-X-004b">
+      <div class="card-header">
+        <div class="platform-dot"></div>
+        <div class="card-title-group">
+          <div class="card-id">CC-X-004b <span class="mode-badge mode-list">List</span></div>
+          <div class="card-title">X Content Pillar Strategy (List)</div>
+          <div class="card-vars">Variables: <span>{creator_expertise}</span> <span>{target_audience}</span> <span>{growth_goal}</span> <span>{posting_frequency}</span></div>
+        </div>
+        <span class="platform-tag">X</span>
+      </div>
+      <div class="prompt-wrap">
+        <pre class="prompt-text">You are an X content strategist. Expertise: {creator_expertise}. Audience: {target_audience}. Goal: {growth_goal}. Frequency: {posting_frequency}/week.
+
+Output in two labeled sections:
+
+Content Pillars (2–4 pillars, each as a labeled block):
+Pillar [#]: [Pillar Name]
+- Topic angle: [what makes this pillar specific enough to own]
+- Post types: [the 2–3 formats this pillar produces — thread / single take / question / case study / etc.]
+- Example post concept: [one concrete post idea]
+- Goal contribution: [one sentence on how this pillar serves {growth_goal}]
+
+Weekly Cadence:
+- Day 1 (lead): Pillar [#] — [format]
+- Day [N] (support): Pillar [#] — [format]
+- Day [N] (close): Pillar [#] — [format]
+- Rotation note: [one sentence on how to vary the pillar order week-to-week to avoid feed monotony]</pre>
+        <button class="copy-btn" onclick="copyPrompt(this)"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg> Copy</button>
+      </div>
+    </div>
+
+    <!-- CC-X-005b -->
+    <div class="card" data-platform="x" data-section="list" data-keywords="x twitter newsletter teaser list options subscriber driver cta" data-id="CC-X-005b">
+      <div class="card-header">
+        <div class="platform-dot"></div>
+        <div class="card-title-group">
+          <div class="card-id">CC-X-005b <span class="mode-badge mode-list">List</span></div>
+          <div class="card-title">Newsletter Teaser & Subscriber Driver (List)</div>
+          <div class="card-vars">Variables: <span>{newsletter_topic}</span> <span>{key_insight_in_issue}</span> <span>{newsletter_name}</span> <span>{target_audience}</span></div>
+        </div>
+        <span class="platform-tag">X</span>
+      </div>
+      <div class="prompt-wrap">
+        <pre class="prompt-text">You are an X writer converting followers into newsletter subscribers. Newsletter: {newsletter_name} for {target_audience}. Issue topic: {newsletter_topic}. Key insight: {key_insight_in_issue}.
+
+Output in two labeled sections:
+
+Teaser Options (three numbered entries — each a standalone post under 280 characters):
+1. [Post text] | Lead angle: insight-first | Click mechanism: [one phrase]
+2. [Post text] | Lead angle: paradox/tension | Click mechanism: [one phrase]
+3. [Post text] | Lead angle: story hook | Click mechanism: [one phrase]
+
+Subscribe Call-to-Action (one line per option — follows the teaser post):
+For Option 1: [CTA line specific to {newsletter_name}'s value — not "subscribe to my newsletter"]
+For Option 2: [CTA line]
+For Option 3: [CTA line]
+
+Recommendation: Use Option #[N] because [one sentence].</pre>
+        <button class="copy-btn" onclick="copyPrompt(this)"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg> Copy</button>
+      </div>
+    </div>
+
+    <!-- CC-LI-001b -->
+    <div class="card" data-platform="li" data-section="list" data-keywords="linkedin authority post list hook story beats insight cta assembled">
+      <div class="card-header">
+        <div class="platform-dot"></div>
+        <div class="card-title-group">
+          <div class="card-id">CC-LI-001b <span class="mode-badge mode-list">List</span></div>
+          <div class="card-title">Authority Post (List)</div>
+          <div class="card-vars">Variables: <span>{insight_or_lesson}</span> <span>{industry}</span> <span>{personal_story}</span> <span>{call_to_action}</span></div>
+        </div>
+        <span class="platform-tag">LinkedIn</span>
+      </div>
+      <div class="prompt-wrap">
+        <pre class="prompt-text">You are a ghostwriter for solo operators building authority on LinkedIn. A creator in the {industry} space wants to publish a post built around this insight: {insight_or_lesson}, grounded in this personal story: {personal_story}, closing with this call to action: {call_to_action}.
+
+Output a structured draft with the following labeled sections:
+
+Hook Line: the single short line that earns the "see more" click — specific, slightly counterintuitive.
+Story Beats: a bulleted list of the story's compact paragraphs in order, each one to three sentences.
+Insight Landing: the line or two that lands the takeaway without preaching it.
+Call to Action: the closing invitation.
+Final Post (Assembled): the same content as it would appear when published — paragraphs separated by line breaks, ready to paste into LinkedIn.
+
+Aim for 150 to 300 words in the assembled version. No emojis unless the creator's voice already includes them.</pre>
+        <button class="copy-btn" onclick="copyPrompt(this)">
+          <svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg>
+          Copy
+        </button>
+      </div>
+    </div>
+
+    <!-- CC-LI-002b -->
+    <div class="card" data-platform="li" data-section="list" data-keywords="linkedin content strategy builder list pillars plan posting cadence" data-id="CC-LI-002b">
+      <div class="card-header">
+        <div class="platform-dot"></div>
+        <div class="card-title-group">
+          <div class="card-id">CC-LI-002b <span class="mode-badge mode-list">List</span></div>
+          <div class="card-title">LinkedIn Content Strategy Builder (List)</div>
+          <div class="card-vars">Variables: <span>{industry}</span> <span>{target_audience}</span> <span>{business_goal}</span> <span>{posting_frequency}</span></div>
+        </div>
+        <span class="platform-tag">LinkedIn</span>
+      </div>
+      <div class="prompt-wrap">
+        <pre class="prompt-text">You are a LinkedIn strategist. Industry: {industry}. Audience: {target_audience}. Goal: {business_goal}. Frequency: {posting_frequency}/week.
+
+Output in two labeled sections:
+
+Content Pillars (2–3 pillars, each as a labeled block):
+Pillar [#]: [Name]
+- Angle: [what makes this specific enough to own in {industry}]
+- Post types: [2–3 formats this pillar generates]
+- Example concept: [one concrete post idea]
+- Audience value: [why {target_audience} cares]
+- Goal link: [how this pillar builds toward {business_goal}]
+
+Weekly Rhythm:
+- Week opener [day]: Pillar [#] — [post type] — [emotional register: thought-provoking / tactical / personal / contrarian]
+- Mid-week [day]: Pillar [#] — [post type] — [emotional register]
+- (If 3/week) Close [day]: Pillar [#] — [post type] — [emotional register]
+- 30-day milestone: [one sentence on what consistent posting at this cadence should achieve toward {business_goal}]</pre>
+        <button class="copy-btn" onclick="copyPrompt(this)"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg> Copy</button>
+      </div>
+    </div>
+
+    <!-- CC-LI-003b -->
+    <div class="card" data-platform="li" data-section="list" data-keywords="linkedin newsletter issue writer list structure sections outline" data-id="CC-LI-003b">
+      <div class="card-header">
+        <div class="platform-dot"></div>
+        <div class="card-title-group">
+          <div class="card-id">CC-LI-003b <span class="mode-badge mode-list">List</span></div>
+          <div class="card-title">LinkedIn Newsletter Issue Writer (List)</div>
+          <div class="card-vars">Variables: <span>{newsletter_name}</span> <span>{issue_topic}</span> <span>{target_audience}</span> <span>{creator_expertise}</span></div>
+        </div>
+        <span class="platform-tag">LinkedIn</span>
+      </div>
+      <div class="prompt-wrap">
+        <pre class="prompt-text">You are a ghostwriter for LinkedIn newsletters. Newsletter: {newsletter_name}. Topic: {issue_topic}. Audience: {target_audience}. Expertise: {creator_expertise}.
+
+Output in two labeled sections:
+
+Issue Outline:
+- Hook (opening line — specific observation, surprising fact, or short scene — not a thesis):
+- Context paragraph (one sentence on why {issue_topic} matters to {target_audience} right now):
+- Core insight or framework (one sentence summary of the main idea):
+- Implication 1: [how it affects {target_audience}]
+- Implication 2: [second angle or counter-consideration]
+- Concrete takeaway: [what the reader can do or think differently]
+- Closing line: [makes the reader look forward to the next issue]
+
+Full Draft (400–700 words, first-person voice, no headers, no bullet lists — continuous prose):
+[issue text]</pre>
+        <button class="copy-btn" onclick="copyPrompt(this)"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg> Copy</button>
+      </div>
+    </div>
+
+    <!-- CC-LI-004b -->
+    <div class="card" data-platform="li" data-section="list" data-keywords="linkedin connection request outreach list message dm versions" data-id="CC-LI-004b">
+      <div class="card-header">
+        <div class="platform-dot"></div>
+        <div class="card-title-group">
+          <div class="card-id">CC-LI-004b <span class="mode-badge mode-list">List</span></div>
+          <div class="card-title">Connection Request & Outreach Writer (List)</div>
+          <div class="card-vars">Variables: <span>{recipient_context}</span> <span>{shared_ground}</span> <span>{outreach_goal}</span> <span>{sender_context}</span></div>
+        </div>
+        <span class="platform-tag">LinkedIn</span>
+      </div>
+      <div class="prompt-wrap">
+        <pre class="prompt-text">You are a relationship strategist. Sender: {sender_context}. Recipient: {recipient_context}. Shared ground: {shared_ground}. Goal: {outreach_goal}.
+
+Output in three labeled sections:
+
+Connection Request Note (max 200 characters — the note attached to the connection request):
+[note text]
+What makes it likely to be accepted: [one phrase]
+
+DM / InMail (150–300 words — for after the connection is accepted or as a cold InMail):
+[message text]
+Opening observation about recipient: [one sentence on what you led with and why]
+
+Follow-Up Message (if already connected — re-engage after prior silence):
+[message text]
+Re-engagement hook used: [one phrase describing the angle]
+
+Rules applied to all three:
+- Lead with something specific about the recipient, not the sender
+- The ask appears only after establishing genuine shared context
+- No "I hope this message finds you well" or equivalent</pre>
+        <button class="copy-btn" onclick="copyPrompt(this)"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg> Copy</button>
+      </div>
+    </div>
+
+    <!-- CC-LI-005b -->
+    <div class="card" data-platform="li" data-section="list" data-keywords="linkedin about section writer list outline draft structure summary" data-id="CC-LI-005b">
+      <div class="card-header">
+        <div class="platform-dot"></div>
+        <div class="card-title-group">
+          <div class="card-id">CC-LI-005b <span class="mode-badge mode-list">List</span></div>
+          <div class="card-title">About Section Writer (List)</div>
+          <div class="card-vars">Variables: <span>{professional_background}</span> <span>{current_focus}</span> <span>{target_reader}</span> <span>{desired_outcome}</span></div>
+        </div>
+        <span class="platform-tag">LinkedIn</span>
+      </div>
+      <div class="prompt-wrap">
+        <pre class="prompt-text">You are a ghostwriter for LinkedIn About sections. Background: {professional_background}. Current focus: {current_focus}. Reader: {target_reader}. Desired outcome: {desired_outcome}.
+
+Output in two labeled sections:
+
+Structure Outline:
+- Opening hook: [the first line — must not begin with "I have been in…" or list years of experience]
+- Narrative beat 1: [what shaped the professional perspective]
+- Narrative beat 2: [what they are building or focused on now]
+- Value to {target_reader}: [what the reader gains from knowing or working with this person]
+- Closing move toward {desired_outcome}: [how the About naturally leads to the outcome without a hard CTA]
+- Tone: [one word describing the register — e.g., direct / warm / authoritative / curious]
+
+Full Draft (250–400 words, first-person voice, no headers, no bullets — continuous prose):
+[about section text]</pre>
+        <button class="copy-btn" onclick="copyPrompt(this)"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg> Copy</button>
+      </div>
+    </div>
+
+    <!-- CC-XP-001b -->
+    <div class="card" data-platform="xp" data-section="list" data-keywords="cross-platform repurposer list card format adaptation production notes">
+      <div class="card-header">
+        <div class="platform-dot"></div>
+        <div class="card-title-group">
+          <div class="card-id">CC-XP-001b <span class="mode-badge mode-list">List</span></div>
+          <div class="card-title">Cross-Platform Repurposer (List)</div>
+          <div class="card-vars">Variables: <span>{source_content}</span> <span>{source_platform}</span> <span>{target_platforms}</span> <span>{creator_voice}</span></div>
+        </div>
+        <span class="platform-tag">All Platforms</span>
+      </div>
+      <div class="prompt-wrap">
+        <pre class="prompt-text">You are a content systems strategist who helps solo creators turn one strong piece of content into a coherent presence across multiple platforms. The source content is: {source_content}. It originally lived on {source_platform}. Adapt it for {target_platforms} while preserving the creator's voice, described as {creator_voice}.
+
+Output one labeled card per target platform. Each card must contain:
+- Platform name
+- Format choice (e.g., Reel, carousel, thread, long post, Short)
+- Why this format (one or two sentences on the platform's attention dynamics and why this adaptation fits)
+- Adapted draft (the actual post, caption, script, or thread, ready to publish)
+- Production notes (any non-text requirements: cover image, B-roll, audio, hashtags)
+
+Each adaptation must feel native to its platform, not a copy-paste with minor edits. If a target platform genuinely doesn't suit the source content, name that in the "Why this format" line and propose the closest viable alternative before drafting.</pre>
+        <button class="copy-btn" onclick="copyPrompt(this)">
+          <svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg>
+          Copy
+        </button>
+      </div>
+    </div>
+
+    <!-- CC-XP-002b -->
+    <div class="card" data-platform="xp" data-section="list" data-keywords="content pillar strategy builder list themes authority platform ecosystem" data-id="CC-XP-002b">
+      <div class="card-header">
+        <div class="platform-dot"></div>
+        <div class="card-title-group">
+          <div class="card-id">CC-XP-002b <span class="mode-badge mode-list">List</span></div>
+          <div class="card-title">Content Pillar Strategy Builder (List)</div>
+          <div class="card-vars">Variables: <span>{creator_expertise}</span> <span>{target_audience}</span> <span>{platforms}</span> <span>{long_term_goal}</span></div>
+        </div>
+        <span class="platform-tag">All Platforms</span>
+      </div>
+      <div class="prompt-wrap">
+        <pre class="prompt-text">You are a content strategist. Expertise: {creator_expertise}. Audience: {target_audience}. Platforms: {platforms}. Goal: {long_term_goal}.
+
+Output in two labeled sections:
+
+Pillar Definitions (2–4 pillars, each as a labeled block):
+Pillar [#]: [Name]
+- Theme: [specific enough to own, broad enough to sustain]
+- Why it serves {target_audience}: [one sentence]
+- Content it produces on [Platform 1]: [format + example concept]
+- Content it produces on [Platform 2]: [format + example concept]
+- (Repeat for each platform in {platforms})
+- Goal contribution: [how this pillar builds toward {long_term_goal}]
+
+Cross-Platform Ecosystem Note:
+- How pillars reinforce each other: [one sentence on the ecosystem effect]
+- Lead platform: [which platform anchors the content and why]
+- Repurpose flow: [how a piece of content moves from the lead platform to others — e.g., YT video → TikTok clip → X thread → IG carousel]</pre>
+        <button class="copy-btn" onclick="copyPrompt(this)"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg> Copy</button>
+      </div>
+    </div>
+
+    <!-- CC-XP-003b -->
+    <div class="card" data-platform="xp" data-section="list" data-keywords="weekly content batch planner list recording session schedule production" data-id="CC-XP-003b">
+      <div class="card-header">
+        <div class="platform-dot"></div>
+        <div class="card-title-group">
+          <div class="card-id">CC-XP-003b <span class="mode-badge mode-list">List</span></div>
+          <div class="card-title">Weekly Content Batch Planner (List)</div>
+          <div class="card-vars">Variables: <span>{platforms}</span> <span>{weekly_output_targets}</span> <span>{content_pillars}</span> <span>{available_recording_time}</span></div>
+        </div>
+        <span class="platform-tag">All Platforms</span>
+      </div>
+      <div class="prompt-wrap">
+        <pre class="prompt-text">You are a content operations strategist. Platforms: {platforms}. Output targets: {weekly_output_targets}. Pillars: {content_pillars}. Available time: {available_recording_time}.
+
+Output in three labeled sections:
+
+Recording Session Plan:
+- Session structure: [how to order the recording block — what to shoot first and why]
+- For each piece to record:
+  - Platform: [target platform]
+  - Concept: [specific content idea tied to a pillar]
+  - Format: [talking head / voiceover / screen record / etc.]
+  - Dependencies: [does this piece feed another platform? e.g., "clips to 3 TikToks"]
+  - Estimated record time: [in minutes]
+
+Editing & Publishing Workflow:
+- Day-by-day schedule for editing, captioning, and scheduling each piece
+- Tools or templates that reduce per-piece editing time
+- Which piece to prioritize if time runs short
+
+Sustainability Check:
+- Total estimated production time: [sum of recording + editing]
+- Verdict: [sustainable / tight / unrealistic at this cadence]
+- Adjustment if needed: [one specific change to make the batch achievable]</pre>
+        <button class="copy-btn" onclick="copyPrompt(this)"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg> Copy</button>
+      </div>
+    </div>
+
+    <!-- CC-XP-004b -->
+    <div class="card" data-platform="xp" data-section="list" data-keywords="brand voice style guide writer list patterns examples wrong right" data-id="CC-XP-004b">
+      <div class="card-header">
+        <div class="platform-dot"></div>
+        <div class="card-title-group">
+          <div class="card-id">CC-XP-004b <span class="mode-badge mode-list">List</span></div>
+          <div class="card-title">Brand Voice & Style Guide Writer (List)</div>
+          <div class="card-vars">Variables: <span>{creator_name}</span> <span>{niche}</span> <span>{content_examples}</span> <span>{platforms}</span></div>
+        </div>
+        <span class="platform-tag">All Platforms</span>
+      </div>
+      <div class="prompt-wrap">
+        <pre class="prompt-text">You are a brand voice strategist. Creator: {creator_name}, niche: {niche}, platforms: {platforms}. Content examples to analyze: {content_examples}.
+
+Output a structured voice guide with the following labeled sections:
+
+Voice Characteristics (each as a labeled line or short block):
+- Sentence length and rhythm: [observable pattern]
+- Use of humor or restraint: [how and when]
+- Expertise mode: [teaches down / talks across / challenges up]
+- Favored words or phrases: [3–5 specific examples]
+- Avoided words or phrases: [3–5 with one-word reason each]
+- How openings work: [pattern observed across examples]
+- How closings work: [pattern observed]
+
+Platform Adaptations:
+For each platform in {platforms}: [one sentence on how the voice shifts — what stays constant, what changes]
+
+Voice Examples — Sounds Right (10 phrases or sentences):
+1. [example] 2. [example] … 10. [example]
+
+Voice Examples — Sounds Wrong (10 phrases or sentences):
+1. [example] 2. [example] … 10. [example]
+
+Usage Note: [one sentence on how to apply this guide when using AI tools to draft content in this voice]</pre>
+        <button class="copy-btn" onclick="copyPrompt(this)"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg> Copy</button>
+      </div>
+    </div>
+
+    <!-- CC-XP-005b -->
+    <div class="card" data-platform="xp" data-section="list" data-keywords="content audit gap identifier list dimensions topic format platform" data-id="CC-XP-005b">
+      <div class="card-header">
+        <div class="platform-dot"></div>
+        <div class="card-title-group">
+          <div class="card-id">CC-XP-005b <span class="mode-badge mode-list">List</span></div>
+          <div class="card-title">Content Audit & Gap Identifier (List)</div>
+          <div class="card-vars">Variables: <span>{existing_content_summary}</span> <span>{platforms}</span> <span>{target_audience}</span> <span>{growth_goal}</span></div>
+        </div>
+        <span class="platform-tag">All Platforms</span>
+      </div>
+      <div class="prompt-wrap">
+        <pre class="prompt-text">You are a content strategist. Existing content: {existing_content_summary}. Platforms: {platforms}. Audience: {target_audience}. Goal: {growth_goal}.
+
+Output a structured audit with three labeled dimensions, then a priority list:
+
+Dimension 1 — Topic Coverage:
+- What the existing content does well: [one sentence]
+- Gap identified: [specific topic area missing or underrepresented]
+- Recommended content to close the gap: [2–3 concrete concepts mapped to {platforms}]
+
+Dimension 2 — Format Balance:
+- Dominant format (overused): [format name + why it limits reach]
+- Missing format (underused): [format name + why it drives discovery on {platforms}]
+- Recommended shift: [specific change to format mix]
+
+Dimension 3 — Platform Alignment:
+- Mismatch identified: [where the content style doesn't match platform behavior]
+- Platform-native adjustment: [what native format or behavior to adopt on each misaligned platform]
+
+Priority Fix List (ordered by expected impact on {growth_goal}):
+1. [Fix] — Expected impact: [one sentence]
+2. [Fix] — Expected impact: [one sentence]
+3. [Fix] — Expected impact: [one sentence]</pre>
+        <button class="copy-btn" onclick="copyPrompt(this)"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg> Copy</button>
+      </div>
+    </div>
+
+  </div><!-- /grid-list -->
+
+  <div class="section-label" data-section="eval">Section C — Evaluators</div>
+  <div class="grid" id="grid-eval">
+
+    <!-- CC-EV-001 -->
+    <div class="card" data-platform="ev" data-section="eval" data-keywords="evaluator draft scorer quality rubric nine dimensions verdict ship revise prose">
+      <div class="card-header">
+        <div class="platform-dot"></div>
+        <div class="card-title-group">
+          <div class="card-id">CC-EV-001 <span class="mode-badge mode-prose">Prose</span></div>
+          <div class="card-title">Creator Draft Evaluator (Prose)</div>
+          <div class="card-vars">Variables: <span>{draft}</span> <span>{platform}</span> <span>{audience}</span> <span>{creator_voice}</span> <span>{creator_goal}</span></div>
+        </div>
+        <span class="platform-tag">All Platforms</span>
+      </div>
+      <div class="prompt-wrap">
+        <pre class="prompt-text">You are a senior creator coach who has reviewed thousands of drafts across YouTube, Instagram, TikTok, X, and LinkedIn. A solo creator has produced this draft: {draft}. It is intended for {platform}, written for an audience of {audience}, in a voice described as {creator_voice}, with the success goal of {creator_goal}.
+
+Evaluate the draft against nine quality dimensions: hook strength (does the opening earn the next second of attention), audience fit (does it speak to the named audience's actual situation), voice authenticity (does it sound like the creator or like generic AI or guru-speak), specificity (concrete details versus abstract claims), platform-native feel (does it match how this platform actually rewards content right now), structural integrity (pacing, retention loops, payoff), originality (does it avoid clichés in this niche), clarity of takeaway and call to action (does the viewer know what they got and what to do), and length and format calibration (is it the right size and shape for the platform).
+
+Score each dimension on a 1-to-5 scale and explain the score in one or two sentences of plain prose, quoting or referencing the part of the draft you are scoring. Be specific. Underperformance helps the creator more than encouragement does, so do not flatter.
+
+Then write a short paragraph summarizing the draft's overall standing. Identify the three highest-leverage rewrites — the changes that would most improve performance — and describe each as a specific edit, not a vague suggestion. Close with a single-line verdict of "Ship," "Revise," or "Scrap and restart," followed by one sentence of justification.
+
+Write the entire evaluation as plain prose. Do not use markdown headers, tables, or bullet points. Inline score callouts are fine (for example, "Hook strength: 3 of 5 — ..."), but the surrounding text should flow as readable paragraphs.</pre>
+        <button class="copy-btn" onclick="copyPrompt(this)">
+          <svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg>
+          Copy
+        </button>
+      </div>
+    </div>
+
+    <!-- CC-EV-002 -->
+    <div class="card" data-platform="ev" data-section="eval" data-keywords="platform growth audit metrics followers reach engagement analysis" data-id="CC-EV-002">
+      <div class="card-header">
+        <div class="platform-dot"></div>
+        <div class="card-title-group">
+          <div class="card-id">CC-EV-002 <span class="mode-badge mode-prose">Prose</span></div>
+          <div class="card-title">Platform Growth Audit</div>
+          <div class="card-vars">Variables: <span>{platform}</span> <span>{current_metrics}</span> <span>{posting_history}</span> <span>{growth_goal}</span></div>
+        </div>
+        <span class="platform-tag">All Platforms</span>
+      </div>
+      <div class="prompt-wrap">
+        <pre class="prompt-text">You are a platform growth analyst who reviews creator accounts when growth has stalled or underperformed expectations. The creator is on {platform}, currently seeing these metrics: {current_metrics}, has been posting with this history: {posting_history}, and wants to achieve {growth_goal}.
+
+Diagnose the growth situation in plain prose. Work through four diagnostic areas in order. First, posting cadence: is the frequency, timing, or consistency creating a structural headwind regardless of content quality? Second, content-audience fit: does the content being produced actually match what {platform}'s algorithm and the target audience reward right now, or is there a mismatch between what the creator makes and what the platform surfaces? Third, content quality leverage points: which metric (watch time, save rate, share rate, comment rate, click-through rate) is most underperforming relative to platform benchmarks, and what does that signal about where the content is losing people? Fourth, growth strategy: is the creator relying too heavily on one type of content, missing discovery-driving formats, or failing to convert casual viewers into followers?
+
+Close with a prioritized action plan — three specific changes, in order of expected impact, written as concrete instructions rather than principles. Be direct. Flattery helps no one.</pre>
+        <button class="copy-btn" onclick="copyPrompt(this)"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg> Copy</button>
+      </div>
+    </div>
+
+    <!-- CC-EV-003 -->
+    <div class="card" data-platform="ev" data-section="eval" data-keywords="content hook evaluator opening first second attention test" data-id="CC-EV-003">
+      <div class="card-header">
+        <div class="platform-dot"></div>
+        <div class="card-title-group">
+          <div class="card-id">CC-EV-003 <span class="mode-badge mode-prose">Prose</span></div>
+          <div class="card-title">Content Hook Evaluator</div>
+          <div class="card-vars">Variables: <span>{hook_text}</span> <span>{platform}</span> <span>{target_audience}</span> <span>{content_topic}</span></div>
+        </div>
+        <span class="platform-tag">All Platforms</span>
+      </div>
+      <div class="prompt-wrap">
+        <pre class="prompt-text">You are a hook specialist who evaluates opening lines and first frames across short-form and long-form content. The creator has written this hook: {hook_text}. It is intended for {platform}, targeting {target_audience}, for content about {content_topic}.
+
+The hook is the most consequential piece of any piece of content. On short-form video it is the first two seconds. On a written post it is the first sentence. On YouTube it is the thumbnail-title combination plus the first thirty seconds. A hook fails when it is too vague to earn the next moment of attention, too familiar to stop a scroll, or too clever to be understood at speed.
+
+Evaluate this hook in plain prose across four dimensions: specificity (does it make a concrete claim or promise that the content can fulfill?), curiosity gap (does it create an open question the viewer needs resolved?), audience resonance (does it speak to a real pain, desire, or identity of {target_audience}?), and platform calibration (does it match the speed and native behavior of {platform}?). Score each dimension on a 1-to-5 scale with a one-sentence rationale. Then rewrite the hook three times — one version pushing specificity harder, one maximizing the curiosity gap, one optimizing for {platform}'s native format. Close with a single-sentence verdict on which rewrite to use and why.</pre>
+        <button class="copy-btn" onclick="copyPrompt(this)"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg> Copy</button>
+      </div>
+    </div>
+
+    <!-- CC-EV-004 -->
+    <div class="card" data-platform="ev" data-section="eval" data-keywords="audience alignment checker content fit target reader match" data-id="CC-EV-004">
+      <div class="card-header">
+        <div class="platform-dot"></div>
+        <div class="card-title-group">
+          <div class="card-id">CC-EV-004 <span class="mode-badge mode-prose">Prose</span></div>
+          <div class="card-title">Audience Alignment Checker</div>
+          <div class="card-vars">Variables: <span>{content_draft}</span> <span>{intended_audience}</span> <span>{platform}</span> <span>{creator_goal}</span></div>
+        </div>
+        <span class="platform-tag">All Platforms</span>
+      </div>
+      <div class="prompt-wrap">
+        <pre class="prompt-text">You are an audience strategist who helps creators identify when their content is drifting from the audience it is supposed to serve. A creator has produced this draft: {content_draft}. It is intended for {intended_audience} on {platform}, with the creator's goal being {creator_goal}.
+
+Audience misalignment is the most common invisible problem in content strategy. A creator can produce technically well-crafted content that consistently underperforms because it is written for the person the creator wants to be rather than the audience they actually want to reach — or because it speaks to a different segment of that audience than the algorithm has been trained to show it to.
+
+Evaluate the draft against the intended audience in plain prose. First, characterize who this draft would actually resonate with based on its vocabulary, assumed knowledge level, tone, and problem framing — and compare that to {intended_audience}. Second, identify any assumptions in the draft that {intended_audience} may not share. Third, name the moment or line in the draft most likely to cause {intended_audience} to disengage, and explain why. Close with three specific edits — not rewrites, but targeted changes — that would bring the draft into tighter alignment with {intended_audience} without changing what the creator is trying to say.</pre>
+        <button class="copy-btn" onclick="copyPrompt(this)"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg> Copy</button>
+      </div>
+    </div>
+
+    <!-- CC-EV-005 -->
+    <div class="card" data-platform="ev" data-section="eval" data-keywords="content calendar reviewer schedule plan strategic gaps opportunities" data-id="CC-EV-005">
+      <div class="card-header">
+        <div class="platform-dot"></div>
+        <div class="card-title-group">
+          <div class="card-id">CC-EV-005 <span class="mode-badge mode-prose">Prose</span></div>
+          <div class="card-title">Content Calendar Reviewer</div>
+          <div class="card-vars">Variables: <span>{calendar_summary}</span> <span>{platforms}</span> <span>{target_audience}</span> <span>{monthly_goal}</span></div>
+        </div>
+        <span class="platform-tag">All Platforms</span>
+      </div>
+      <div class="prompt-wrap">
+        <pre class="prompt-text">You are a content calendar strategist who reviews planned schedules before a creator executes them — catching problems it is easier to fix on paper than after a month of posting. The creator has planned the following: {calendar_summary}. They publish on {platforms} for {target_audience} with a monthly goal of {monthly_goal}.
+
+Review the calendar in plain prose across five dimensions. First, goal alignment: does the mix of content types and topics actually serve {monthly_goal}, or is the calendar built around what is easy to produce rather than what moves the needle? Second, audience variety: does the calendar serve different stages of the audience relationship — discovery content for new viewers, depth content for existing followers, and conversion content for those ready to take action? Third, format balance: is any single format over- or underused relative to what {platforms} reward right now? Fourth, pillar coverage: are all content pillars represented, and is any one overrepresented to the point of boring the audience? Fifth, sustainability: is the production load realistic for a solo creator, or does it depend on a pace that will collapse in week two?
+
+Close with a priority fix list — the three changes that would most improve the calendar's strategic effectiveness before execution begins.</pre>
+        <button class="copy-btn" onclick="copyPrompt(this)"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg> Copy</button>
+      </div>
+    </div>
+
+    <!-- CC-EV-001b -->
+    <div class="card" data-platform="ev" data-section="eval" data-keywords="evaluator draft scorer quality rubric nine dimensions verdict ship revise list structured">
+      <div class="card-header">
+        <div class="platform-dot"></div>
+        <div class="card-title-group">
+          <div class="card-id">CC-EV-001b <span class="mode-badge mode-list">List</span></div>
+          <div class="card-title">Creator Draft Evaluator (List)</div>
+          <div class="card-vars">Variables: <span>{draft}</span> <span>{platform}</span> <span>{audience}</span> <span>{creator_voice}</span> <span>{creator_goal}</span></div>
+        </div>
+        <span class="platform-tag">All Platforms</span>
+      </div>
+      <div class="prompt-wrap">
+        <pre class="prompt-text">You are a senior creator coach who has reviewed thousands of drafts across YouTube, Instagram, TikTok, X, and LinkedIn. A solo creator has produced this draft: {draft}. It is intended for {platform}, written for an audience of {audience}, in a voice described as {creator_voice}, with the success goal of {creator_goal}.
+
+Output a structured evaluation with the following labeled sections:
+
+Rubric Scores (1–5 each, with a one-sentence rationale that quotes or references the draft):
+- Hook strength
+- Audience fit
+- Voice authenticity
+- Specificity
+- Platform-native feel
+- Structural integrity
+- Originality
+- Clarity of takeaway and CTA
+- Length and format calibration
+
+Overall Score: the average of the above, rounded to one decimal.
+
+Standing: a two- or three-sentence summary of where the draft stands.
+
+Top Three Rewrites: a numbered list of the three highest-leverage edits. For each, name the exact line or section to change and the specific change to make — not a vague suggestion.
+
+Verdict: one of "Ship," "Revise," or "Scrap and restart," with a one-sentence justification.
+
+Be specific and direct. Underperformance helps the creator more than encouragement does.</pre>
+        <button class="copy-btn" onclick="copyPrompt(this)">
+          <svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg>
+          Copy
+        </button>
+      </div>
+    </div>
+
+    <!-- CC-EV-002b -->
+    <div class="card" data-platform="ev" data-section="eval" data-keywords="platform growth audit list metrics diagnosis dimensions action plan" data-id="CC-EV-002b">
+      <div class="card-header">
+        <div class="platform-dot"></div>
+        <div class="card-title-group">
+          <div class="card-id">CC-EV-002b <span class="mode-badge mode-list">List</span></div>
+          <div class="card-title">Platform Growth Audit (List)</div>
+          <div class="card-vars">Variables: <span>{platform}</span> <span>{current_metrics}</span> <span>{posting_history}</span> <span>{growth_goal}</span></div>
+        </div>
+        <span class="platform-tag">All Platforms</span>
+      </div>
+      <div class="prompt-wrap">
+        <pre class="prompt-text">You are a platform growth analyst. Platform: {platform}. Current metrics: {current_metrics}. Posting history: {posting_history}. Goal: {growth_goal}.
+
+Output a structured audit with four diagnostic dimensions, then a priority action plan:
+
+Dimension 1 — Posting Cadence:
+- Assessment: [sustainable / inconsistent / too frequent / too sparse]
+- Impact on growth: [one sentence]
+- Recommended change: [specific adjustment]
+
+Dimension 2 — Content-Audience Fit:
+- Fit rating: [strong / partial / misaligned]
+- Evidence from metrics: [which number signals the fit problem]
+- Recommended change: [specific adjustment]
+
+Dimension 3 — Quality Leverage Point:
+- Underperforming metric: [the one metric most below platform benchmarks]
+- What it signals: [where the content is losing people]
+- Recommended change: [specific adjustment]
+
+Dimension 4 — Growth Strategy:
+- Current approach: [one sentence characterizing the strategy]
+- Structural gap: [what discovery-driving behavior is missing]
+- Recommended change: [specific adjustment]
+
+Priority Action Plan (ordered by expected impact):
+1. [Action] — Timeline: [when to implement] — Expected result: [one phrase]
+2. [Action] — Timeline: [when to implement] — Expected result: [one phrase]
+3. [Action] — Timeline: [when to implement] — Expected result: [one phrase]</pre>
+        <button class="copy-btn" onclick="copyPrompt(this)"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg> Copy</button>
+      </div>
+    </div>
+
+    <!-- CC-EV-003b -->
+    <div class="card" data-platform="ev" data-section="eval" data-keywords="content hook evaluator list dimensions score rewrite options verdict" data-id="CC-EV-003b">
+      <div class="card-header">
+        <div class="platform-dot"></div>
+        <div class="card-title-group">
+          <div class="card-id">CC-EV-003b <span class="mode-badge mode-list">List</span></div>
+          <div class="card-title">Content Hook Evaluator (List)</div>
+          <div class="card-vars">Variables: <span>{hook_text}</span> <span>{platform}</span> <span>{target_audience}</span> <span>{content_topic}</span></div>
+        </div>
+        <span class="platform-tag">All Platforms</span>
+      </div>
+      <div class="prompt-wrap">
+        <pre class="prompt-text">You are a hook specialist. Hook: "{hook_text}". Platform: {platform}. Audience: {target_audience}. Topic: {content_topic}.
+
+Output in three labeled sections:
+
+Hook Scores (1–5 each, with a one-sentence rationale quoting or referencing the hook):
+- Specificity: [score] — [rationale]
+- Curiosity gap: [score] — [rationale]
+- Audience resonance: [score] — [rationale]
+- Platform calibration: [score] — [rationale]
+- Overall: [average, rounded to one decimal]
+
+Rewrites (three versions, each on a labeled line):
+- Specificity-maximized: [rewrite]
+- Curiosity-gap-maximized: [rewrite]
+- Platform-native-optimized for {platform}: [rewrite]
+
+Verdict:
+- Use: [which rewrite or the original]
+- Reason: [one sentence]
+- What to avoid in future hooks for {target_audience}: [one specific pattern]</pre>
+        <button class="copy-btn" onclick="copyPrompt(this)"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg> Copy</button>
+      </div>
+    </div>
+
+    <!-- CC-EV-004b -->
+    <div class="card" data-platform="ev" data-section="eval" data-keywords="audience alignment checker list dimensions assumptions edits mismatch" data-id="CC-EV-004b">
+      <div class="card-header">
+        <div class="platform-dot"></div>
+        <div class="card-title-group">
+          <div class="card-id">CC-EV-004b <span class="mode-badge mode-list">List</span></div>
+          <div class="card-title">Audience Alignment Checker (List)</div>
+          <div class="card-vars">Variables: <span>{content_draft}</span> <span>{intended_audience}</span> <span>{platform}</span> <span>{creator_goal}</span></div>
+        </div>
+        <span class="platform-tag">All Platforms</span>
+      </div>
+      <div class="prompt-wrap">
+        <pre class="prompt-text">You are an audience strategist. Draft: {content_draft}. Intended audience: {intended_audience}. Platform: {platform}. Goal: {creator_goal}.
+
+Output in three labeled sections:
+
+Audience Characterization:
+- Who this draft actually speaks to: [based on vocabulary, assumed knowledge, tone, problem framing]
+- Alignment with {intended_audience}: [aligned / partially aligned / misaligned]
+- Key mismatch (if any): [one sentence on where the draft loses {intended_audience}]
+
+Assumption Audit (bulleted list of assumptions the draft makes that {intended_audience} may not share):
+- [assumption 1]
+- [assumption 2]
+- [assumption 3 if applicable]
+
+Targeted Edits (three specific changes — exact line or section + what to change):
+1. [Location in draft] → [Specific change] — Alignment impact: [one phrase]
+2. [Location in draft] → [Specific change] — Alignment impact: [one phrase]
+3. [Location in draft] → [Specific change] — Alignment impact: [one phrase]
+
+Note: These are targeted edits, not a rewrite. The creator's core message should remain intact.</pre>
+        <button class="copy-btn" onclick="copyPrompt(this)"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg> Copy</button>
+      </div>
+    </div>
+
+    <!-- CC-EV-005b -->
+    <div class="card" data-platform="ev" data-section="eval" data-keywords="content calendar reviewer list dimensions goal audience format pillar" data-id="CC-EV-005b">
+      <div class="card-header">
+        <div class="platform-dot"></div>
+        <div class="card-title-group">
+          <div class="card-id">CC-EV-005b <span class="mode-badge mode-list">List</span></div>
+          <div class="card-title">Content Calendar Reviewer (List)</div>
+          <div class="card-vars">Variables: <span>{calendar_summary}</span> <span>{platforms}</span> <span>{target_audience}</span> <span>{monthly_goal}</span></div>
+        </div>
+        <span class="platform-tag">All Platforms</span>
+      </div>
+      <div class="prompt-wrap">
+        <pre class="prompt-text">You are a content calendar strategist. Calendar: {calendar_summary}. Platforms: {platforms}. Audience: {target_audience}. Goal: {monthly_goal}.
+
+Output a structured review across five dimensions, then a priority fix list:
+
+Dimension 1 — Goal Alignment:
+- Rating: [aligned / partially / misaligned]
+- Gap: [what's in the calendar that doesn't move {monthly_goal}]
+- Fix: [specific change]
+
+Dimension 2 — Audience Variety:
+- Discovery content (new viewers): [present / missing]
+- Depth content (existing followers): [present / missing]
+- Conversion content (action-ready): [present / missing]
+- Fix: [what to add or rebalance]
+
+Dimension 3 — Format Balance:
+- Overused format: [format + why it limits reach]
+- Underused format: [format + why it helps]
+- Fix: [specific swap or addition]
+
+Dimension 4 — Pillar Coverage:
+- Overrepresented pillar: [pillar name + risk]
+- Underrepresented pillar: [pillar name + opportunity]
+- Fix: [specific rebalance]
+
+Dimension 5 — Sustainability:
+- Load assessment: [realistic / tight / unrealistic]
+- Risk point: [where the schedule is most likely to slip]
+- Fix: [one concrete adjustment]
+
+Priority Fix List (ordered by impact on {monthly_goal}):
+1. [Fix]
+2. [Fix]
+3. [Fix]</pre>
+        <button class="copy-btn" onclick="copyPrompt(this)"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg> Copy</button>
+      </div>
+    </div>
+
+  </div><!-- /grid-eval -->
+
+  <div class="no-results" id="noResults">No prompts match your search.</div>
+
+</main>
+
+<div class="export-toolbar" id="exportToolbar">
+  <span class="export-count-label" id="exportCount">0 prompts selected</span>
+  <button class="export-action-btn" onclick="exportSelected('pdf')">Export PDF</button>
+  <button class="export-action-btn" onclick="exportSelected('doc')">Export Word</button>
+  <button class="export-action-btn primary" onclick="exportSelected('slides')">Export Slides</button>
+  <button class="export-clear-btn" onclick="clearSelection()">Clear selection</button>
+</div>
+
+<script>
+  // ── COLLAPSIBLE ──
+  function toggleCard(card) { card.classList.toggle('open'); }
+
+  // ── SELECTION ──
+  const selectedIds = new Set();
+
+  function handleSelect(cb) {
+    const card = cb.closest('.card');
+    const id = card.dataset.id || '';
+    if (cb.checked) { selectedIds.add(id); card.classList.add('selected'); }
+    else { selectedIds.delete(id); card.classList.remove('selected'); }
+    updateExportBar();
+  }
+
+  function updateExportBar() {
+    const toolbar = document.getElementById('exportToolbar');
+    const n = selectedIds.size;
+    toolbar.classList.toggle('show', n > 0);
+    document.getElementById('exportCount').textContent = `${n} prompt${n !== 1 ? 's' : ''} selected`;
+  }
+
+  function clearSelection() {
+    document.querySelectorAll('.card-select:checked').forEach(cb => {
+      cb.checked = false;
+      cb.closest('.card').classList.remove('selected');
+    });
+    selectedIds.clear();
+    updateExportBar();
+  }
+
+  function getSelectedPrompts() {
+    return Array.from(document.querySelectorAll('.card'))
+      .filter(c => selectedIds.has(c.dataset.id))
+      .map(c => ({
+        id: c.dataset.id || '',
+        title: c.querySelector('.card-title')?.textContent || '',
+        platform: c.querySelector('.platform-tag')?.textContent || '',
+        text: c.querySelector('.prompt-text')?.textContent || ''
+      }));
+  }
+
+  function exportSelected(format) {
+    const prompts = getSelectedPrompts();
+    if (!prompts.length) return;
+    if (format === 'pdf') exportPromptsPDF(prompts);
+    else if (format === 'doc') exportPromptsWord(prompts);
+    else if (format === 'slides') exportPromptsSlides(prompts);
+  }
+
+  function exportPromptsPDF(prompts) {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ unit: 'pt', format: 'letter' });
+    const margin = 50, pageW = doc.internal.pageSize.getWidth(), lineH = 14;
+    let y = margin;
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(18);
+    doc.text('Prompt Library Export', margin, y); y += 32;
+    prompts.forEach((p, i) => {
+      if (y > 700) { doc.addPage(); y = margin; }
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(12);
+      doc.text(`${i + 1}. ${p.id} — ${p.title}`, margin, y); y += 18;
+      doc.setFont('helvetica', 'italic'); doc.setFontSize(9);
+      doc.text(p.platform, margin, y); y += 14;
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(9);
+      doc.splitTextToSize(p.text, pageW - margin * 2).forEach(line => {
+        if (y > 730) { doc.addPage(); y = margin; }
+        doc.text(line, margin, y); y += lineH;
+      });
+      y += 22;
+    });
+    doc.save('prompt-library-export.pdf');
+  }
+
+  function exportPromptsWord(prompts) {
+    let html = '<html><head><meta charset="utf-8"><style>body{font-family:Calibri,sans-serif;font-size:11pt}h1{font-size:16pt}h2{font-size:13pt;color:#1a56db}pre{font-family:Consolas,monospace;font-size:9pt;white-space:pre-wrap;background:#f5f5f5;padding:12px}hr{border:none;border-top:1px solid #ddd}</style></head><body>';
+    html += '<h1>Prompt Library Export</h1>';
+    prompts.forEach((p, i) => {
+      html += `<h2>${i + 1}. ${p.id} — ${p.title}</h2><p><em>${p.platform}</em></p>`;
+      html += `<pre>${p.text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</pre><hr>`;
+    });
+    html += '</body></html>';
+    const a = Object.assign(document.createElement('a'), {
+      href: URL.createObjectURL(new Blob([html], { type: 'application/msword' })),
+      download: 'prompt-library-export.doc'
+    });
+    a.click();
+  }
+
+  function exportPromptsSlides(prompts) {
+    const pptx = new PptxGenJS();
+    pptx.layout = 'LAYOUT_WIDE';
+    prompts.forEach(p => {
+      const slide = pptx.addSlide();
+      slide.background = { color: '0d0d0d' };
+      slide.addText(p.id, { x:0.4, y:0.3, w:12, h:0.4, fontSize:11, color:'888888', fontFace:'Consolas' });
+      slide.addText(p.title, { x:0.4, y:0.7, w:12, h:0.65, fontSize:22, bold:true, color:'ffffff', fontFace:'Calibri' });
+      slide.addText(p.platform, { x:0.4, y:1.35, w:4, h:0.3, fontSize:10, color:'4f8ef7', fontFace:'Calibri' });
+      const t = p.text.length > 900 ? p.text.slice(0, 900) + '…' : p.text;
+      slide.addText(t, { x:0.4, y:1.85, w:12.5, h:5.3, fontSize:9, color:'c8d0e0', fontFace:'Consolas', valign:'top', wrap:true });
+    });
+    pptx.writeFile({ fileName: 'prompt-library-export.pptx' });
+  }
+
+  // ── INIT: inject checkboxes, chevrons, data-ids, wire toggles ──
+  document.querySelectorAll('.card').forEach(card => {
+    const idEl = card.querySelector('.card-id');
+    if (idEl && !card.dataset.id) card.dataset.id = idEl.textContent.trim().split(' ')[0];
+    const header = card.querySelector('.card-header');
+    if (!header) return;
+    const cb = document.createElement('input');
+    cb.type = 'checkbox'; cb.className = 'card-select'; cb.title = 'Select for export';
+    cb.addEventListener('click', e => { e.stopPropagation(); handleSelect(cb); });
+    header.insertBefore(cb, header.firstChild);
+    header.insertAdjacentHTML('beforeend', '<svg class="card-chevron" viewBox="0 0 16 16" fill="currentColor"><path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"/></svg>');
+    header.addEventListener('click', () => toggleCard(card));
+  });
+
+  // ── COPY ──
+  function copyPrompt(btn) {
+    const text = btn.closest('.prompt-wrap').querySelector('.prompt-text').textContent;
+    navigator.clipboard.writeText(text).then(() => {
+      const orig = btn.innerHTML;
+      btn.classList.add('copied');
+      btn.innerHTML = `<svg viewBox="0 0 16 16" fill="currentColor"><path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/></svg> Copied!`;
+      setTimeout(() => { btn.classList.remove('copied'); btn.innerHTML = orig; }, 2000);
+    });
+  }
+
+  // ── FILTER ──
+  const filterBtns = document.querySelectorAll('.filter-btn[data-filter]');
+  const cards = document.querySelectorAll('.card');
+  const noResults = document.getElementById('noResults');
+  const searchInput = document.getElementById('searchInput');
+  let activeFilter = 'all', searchQuery = '';
+
+  filterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      filterBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeFilter = btn.dataset.filter;
+      applyFilters();
+    });
+  });
+
+  searchInput.addEventListener('input', e => {
+    searchQuery = e.target.value.toLowerCase().trim();
+    applyFilters();
+  });
+
+  function applyFilters() {
+    let visible = 0;
+    cards.forEach(card => {
+      const platform = card.dataset.platform;
+      const keywords = (card.dataset.keywords || '') + ' ' +
+        (card.querySelector('.card-title')?.textContent.toLowerCase() || '') + ' ' +
+        (card.querySelector('.card-id')?.textContent.toLowerCase() || '') + ' ' +
+        (card.querySelector('.prompt-text')?.textContent.toLowerCase() || '');
+      const matchPlatform = activeFilter === 'all' || platform === activeFilter;
+      const matchSearch = !searchQuery || keywords.includes(searchQuery);
+      if (matchPlatform && matchSearch) { card.style.display = ''; visible++; }
+      else card.style.display = 'none';
+    });
+    document.querySelectorAll('.grid').forEach(grid => {
+      const vis = Array.from(grid.querySelectorAll('.card')).some(c => c.style.display !== 'none');
+      const label = grid.previousElementSibling;
+      if (label?.classList.contains('section-label')) label.style.display = vis ? '' : 'none';
+      grid.style.display = vis ? '' : 'none';
+    });
+    noResults.style.display = visible === 0 ? 'block' : 'none';
+  }
+
+  function toggleToolsMenu() {
+    const menu = document.getElementById('toolsMenu');
+    const btn  = document.getElementById('toolsBtn');
+    if (menu.classList.contains('open')) {
+      menu.classList.remove('open');
+    } else {
+      const rect = btn.getBoundingClientRect();
+      menu.style.top  = (rect.bottom + 4) + 'px';
+      menu.style.left = Math.max(8, rect.right - 230) + 'px';
+      menu.classList.add('open');
+    }
+  }
+  document.addEventListener('click', e => {
+    const dd = document.getElementById('toolsDropdown');
+    if (dd && !dd.contains(e.target)) {
+      document.getElementById('toolsMenu').classList.remove('open');
+    }
+  });
+</script>
+</body>
+</html>
