@@ -4,4 +4,4 @@
 
 ## A simple website built in HTML by Claude (work in progress....)
 
-<b>[See It Here](https://presicion25.github.io/claude-os/index.html)
+<b>[See It Here](https://presicion25.github.io/claude-creator-ops/index.html)
