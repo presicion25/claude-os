@@ -1,0 +1,799 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude Code — 200 Web App & SaaS Business Ideas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy:    #0D0F1A;
+    --navy2:   #161827;
+    --navy3:   #1E2035;
+    --border:  #2A2D45;
+    --border2: #353856;
+    --text:    #E8EAF6;
+    --muted:   #8B8FA8;
+    --dim:     #555870;
+
+    --beg:     #4ADE80;
+    --beg-bg:  rgba(74,222,128,.08);
+    --beg-bd:  rgba(74,222,128,.2);
+
+    --int:     #FBBF24;
+    --int-bg:  rgba(251,191,36,.08);
+    --int-bd:  rgba(251,191,36,.2);
+
+    --adv:     #F87171;
+    --adv-bg:  rgba(248,113,113,.08);
+    --adv-bd:  rgba(248,113,113,.2);
+
+    --accent:  #818CF8;
+    --accent2: #6366F1;
+
+    --saas:    #34D4F1;
+    --saas-bg: rgba(52,212,241,.08);
+    --saas-bd: rgba(52,212,241,.22);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--navy);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed; inset: 0; z-index: 0;
+    background-image:
+      linear-gradient(var(--border) 1px, transparent 1px),
+      linear-gradient(90deg, var(--border) 1px, transparent 1px);
+    background-size: 40px 40px;
+    opacity: .35;
+    pointer-events: none;
+  }
+
+  .wrap { position: relative; z-index: 1; max-width: 1260px; margin: 0 auto; padding: 48px 24px 80px; }
+
+  header { margin-bottom: 48px; }
+
+  .eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .eyebrow::before {
+    content: '';
+    display: block; width: 24px; height: 1px;
+    background: var(--accent);
+  }
+
+  h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(32px, 5vw, 56px);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -.02em;
+    color: var(--text);
+  }
+  h1 em {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  .subtitle {
+    margin-top: 14px;
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    color: var(--muted);
+    max-width: 600px;
+    line-height: 1.7;
+  }
+
+  .saas-callout {
+    margin-top: 20px;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 16px 20px;
+    border-radius: 10px;
+    border: 1px solid var(--saas-bd);
+    background: var(--saas-bg);
+    max-width: 680px;
+  }
+  .saas-callout-icon { font-size: 20px; flex-shrink: 0; margin-top: 1px; }
+  .saas-callout-body {}
+  .saas-callout-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 13px; font-weight: 700;
+    color: var(--saas); letter-spacing: .04em; margin-bottom: 4px;
+  }
+  .saas-callout-text { font-size: 11px; color: var(--muted); line-height: 1.65; }
+
+  .stats { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px; }
+  .stat {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 16px; border-radius: 999px;
+    border: 1px solid var(--border2); background: var(--navy2); font-size: 12px;
+  }
+  .stat-num { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 700; line-height: 1; }
+  .stat-label { color: var(--muted); font-size: 11px; letter-spacing: .06em; }
+  .stat.beg .stat-num  { color: var(--beg); }
+  .stat.int .stat-num  { color: var(--int); }
+  .stat.adv .stat-num  { color: var(--adv); }
+  .stat.tot .stat-num  { color: var(--accent); }
+  .stat.saas .stat-num { color: var(--saas); }
+
+  .controls { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; align-items: center; }
+
+  .search-wrap { position: relative; flex: 1; min-width: 220px; }
+  .search-wrap input {
+    width: 100%; background: var(--navy2); border: 1px solid var(--border2);
+    border-radius: 8px; padding: 9px 12px 9px 36px;
+    color: var(--text); font-family: 'DM Mono', monospace; font-size: 13px;
+    outline: none; transition: border-color .2s;
+  }
+  .search-wrap input:focus { border-color: var(--accent); }
+  .search-wrap input::placeholder { color: var(--dim); }
+  .search-icon {
+    position: absolute; left: 12px; top: 50%;
+    transform: translateY(-50%);
+    color: var(--dim); font-size: 14px; pointer-events: none;
+  }
+
+  .filter-group { display: flex; gap: 6px; flex-wrap: wrap; }
+  .filter-btn {
+    padding: 7px 14px; border-radius: 999px; cursor: pointer;
+    font-family: 'DM Mono', monospace; font-size: 11px;
+    letter-spacing: .06em; text-transform: uppercase;
+    border: 1px solid var(--border2); background: var(--navy2); color: var(--muted);
+    transition: all .15s;
+  }
+  .filter-btn:hover { color: var(--text); }
+  .filter-btn.active-all   { background: var(--accent2); border-color: var(--accent2); color: #fff; }
+  .filter-btn.active-beg   { background: var(--beg-bg); border-color: var(--beg-bd); color: var(--beg); }
+  .filter-btn.active-int   { background: var(--int-bg); border-color: var(--int-bd); color: var(--int); }
+  .filter-btn.active-adv   { background: var(--adv-bg); border-color: var(--adv-bd); color: var(--adv); }
+  .filter-btn.active-saas  { background: var(--saas-bg); border-color: var(--saas-bd); color: var(--saas); }
+
+  .sort-group { display: flex; gap: 6px; align-items: center; }
+  .sort-label { font-size: 11px; color: var(--dim); letter-spacing: .06em; text-transform: uppercase; }
+  .sort-btn {
+    padding: 7px 12px; border-radius: 6px; cursor: pointer;
+    font-family: 'DM Mono', monospace; font-size: 11px;
+    border: 1px solid var(--border); background: transparent; color: var(--dim);
+    transition: all .15s;
+  }
+  .sort-btn:hover { color: var(--text); border-color: var(--border2); }
+  .sort-btn.active { background: var(--navy3); color: var(--text); border-color: var(--border2); }
+
+  .results-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 12px;
+    font-size: 11px; color: var(--dim); letter-spacing: .06em; text-transform: uppercase;
+  }
+  .results-count { color: var(--muted); }
+  .results-count span { color: var(--accent); font-weight: 500; }
+
+  .table-wrap { border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+
+  table { width: 100%; border-collapse: collapse; }
+
+  thead tr { background: var(--navy3); border-bottom: 1px solid var(--border2); }
+  th {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px; letter-spacing: .12em;
+    text-transform: uppercase; color: var(--dim);
+    padding: 12px 16px; text-align: left;
+    font-weight: 400; white-space: nowrap;
+    cursor: pointer; user-select: none; transition: color .15s;
+  }
+  th:hover { color: var(--muted); }
+  th.sort-active { color: var(--accent); }
+  th .sort-arrow { margin-left: 4px; opacity: .5; }
+  th.sort-active .sort-arrow { opacity: 1; }
+
+  tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background .12s;
+    animation: rowIn .3s ease both;
+  }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: var(--navy2); }
+
+  @keyframes rowIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  td { padding: 13px 16px; vertical-align: top; font-size: 13px; line-height: 1.4; }
+
+  .td-num { font-size: 11px; color: var(--dim); font-weight: 500; white-space: nowrap; width: 44px; }
+  .td-name { font-weight: 400; color: var(--text); min-width: 220px; }
+  .td-name strong { font-weight: 500; }
+
+  .tier-badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 3px 10px; border-radius: 999px;
+    font-size: 10px; letter-spacing: .06em;
+    text-transform: uppercase; font-weight: 500; white-space: nowrap;
+  }
+  .tier-beg { background: var(--beg-bg); color: var(--beg); border: 1px solid var(--beg-bd); }
+  .tier-int { background: var(--int-bg); color: var(--int); border: 1px solid var(--int-bd); }
+  .tier-adv { background: var(--adv-bg); color: var(--adv); border: 1px solid var(--adv-bd); }
+
+  .cat-badge {
+    display: inline-flex; align-items: center;
+    padding: 2px 9px; border-radius: 999px;
+    font-size: 9px; letter-spacing: .08em;
+    text-transform: uppercase; font-weight: 600; white-space: nowrap;
+  }
+  .cat-saas { background: var(--saas-bg); color: var(--saas); border: 1px solid var(--saas-bd); }
+
+  .rev-pill {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 2px 8px; border-radius: 4px;
+    font-size: 9px; letter-spacing: .06em;
+    text-transform: uppercase; font-weight: 500; white-space: nowrap;
+    background: rgba(129,140,248,.1); border: 1px solid rgba(129,140,248,.2); color: var(--accent);
+    margin-right: 4px; margin-bottom: 3px;
+  }
+
+  .stars { color: var(--accent); letter-spacing: -1px; font-size: 12px; white-space: nowrap; }
+  .stars-empty { color: var(--border2); }
+
+  .td-time { color: var(--muted); white-space: nowrap; font-size: 12px; }
+  .td-mrr  { color: var(--saas); white-space: nowrap; font-size: 12px; font-weight: 500; }
+  .td-cat  { color: var(--dim); font-size: 11px; font-style: italic; white-space: nowrap; }
+
+  .new-badge {
+    display: inline-flex; align-items: center;
+    padding: 1px 7px; border-radius: 999px;
+    font-size: 9px; letter-spacing: .08em;
+    text-transform: uppercase; font-weight: 600;
+    background: rgba(129,140,248,0.15); color: var(--accent);
+    border: 1px solid rgba(129,140,248,0.3);
+    margin-left: 6px; vertical-align: middle;
+  }
+
+  .section-divider td { padding: 0; background: transparent; }
+  .section-divider-inner {
+    display: flex; align-items: center; gap: 14px; padding: 28px 16px 10px;
+  }
+  .section-divider-line {
+    flex: 1; height: 1px;
+    background: linear-gradient(90deg, var(--saas-bd) 0%, transparent 100%);
+  }
+  .section-divider-label {
+    display: flex; align-items: center; gap: 10px;
+    font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 700;
+    color: var(--saas); letter-spacing: .12em; text-transform: uppercase; white-space: nowrap;
+  }
+  .section-divider-label .sdl-icon {
+    width: 22px; height: 22px; border-radius: 6px;
+    background: var(--saas-bg); border: 1px solid var(--saas-bd);
+    display: flex; align-items: center; justify-content: center; font-size: 11px;
+  }
+  .section-divider-count {
+    font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 400;
+    color: var(--saas); background: var(--saas-bg); border: 1px solid var(--saas-bd);
+    border-radius: 999px; padding: 1px 8px;
+  }
+
+  .name-row { display: flex; align-items: flex-start; gap: 10px; }
+  .td-chevron {
+    color: var(--dim); font-size: 15px; line-height: 1;
+    display: inline-block; transition: transform .22s ease, color .15s;
+    flex-shrink: 0; margin-left: auto; margin-top: 2px; user-select: none;
+  }
+  tr[data-expanded="true"] .td-chevron { transform: rotate(90deg); color: var(--accent); }
+
+  .td-desc-wrap {
+    max-height: 0; overflow: hidden; opacity: 0; margin-top: 0;
+    transition: max-height .3s ease, opacity .25s ease, margin-top .25s ease;
+  }
+  tr[data-expanded="true"] .td-desc-wrap { max-height: 200px; opacity: 1; margin-top: 8px; }
+
+  .td-desc { font-size: 11px; color: var(--muted); line-height: 1.7; font-weight: 300; max-width: 540px; }
+  .td-desc-saas { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 4px; }
+
+  .empty { padding: 60px 24px; text-align: center; color: var(--dim); font-size: 13px; }
+  .empty-icon { font-size: 32px; margin-bottom: 12px; }
+
+  footer {
+    margin-top: 40px; display: flex; flex-wrap: wrap;
+    align-items: center; justify-content: space-between;
+    gap: 12px; font-size: 11px; color: var(--dim); letter-spacing: .06em;
+  }
+
+  .legend { display: flex; gap: 16px; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 6px; }
+  .legend-dot { width: 7px; height: 7px; border-radius: 50%; }
+  .legend-dot.beg  { background: var(--beg); }
+  .legend-dot.int  { background: var(--int); }
+  .legend-dot.adv  { background: var(--adv); }
+  .legend-dot.saas { background: var(--saas); }
+
+  @media (max-width: 820px) {
+    .td-cat, .td-time, .col-mrr { display: none; }
+    h1 { font-size: 28px; }
+    .saas-callout { max-width: 100%; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow">Claude Code Project Index</div>
+    <h1>200 Web App &amp; SaaS<br><em>Business Ideas</em></h1>
+    <p class="subtitle">150 Claude Code web app projects from 20-minute beginner builds to full-stack tools — plus 50 SaaS businesses you can build and sell as a recurring-revenue online income.</p>
+
+    <div class="saas-callout">
+      <div class="saas-callout-icon">◈</div>
+      <div class="saas-callout-body">
+        <div class="saas-callout-title">What is a SaaS Business Idea?</div>
+        <div class="saas-callout-text">Software as a Service (SaaS) means you build a tool once and sell ongoing access via a monthly or annual subscription. Every idea in the SaaS category is a real, launchable online business — not a one-off client deliverable. Click any SaaS row to see the revenue model, target customer, and estimated MRR potential.</div>
+      </div>
+    </div>
+
+    <div class="stats">
+      <div class="stat tot"><div><div class="stat-num">200</div><div class="stat-label">Total Ideas</div></div></div>
+      <div class="stat beg"><div><div class="stat-num">55</div><div class="stat-label">Beginner</div></div></div>
+      <div class="stat int"><div><div class="stat-num">55</div><div class="stat-label">Intermediate</div></div></div>
+      <div class="stat adv"><div><div class="stat-num">55</div><div class="stat-label">Advanced</div></div></div>
+      <div class="stat saas"><div><div class="stat-num">50</div><div class="stat-label">SaaS Businesses</div></div></div>
+    </div>
+  </header>
+
+  <div class="controls">
+    <div class="search-wrap">
+      <span class="search-icon">⌕</span>
+      <input type="text" id="searchInput" placeholder="Search ideas, categories, revenue models…">
+    </div>
+    <div class="filter-group">
+      <button class="filter-btn active-all" data-tier="all">All</button>
+      <button class="filter-btn" data-tier="beginner">🟢 Beginner</button>
+      <button class="filter-btn" data-tier="intermediate">🟡 Intermediate</button>
+      <button class="filter-btn" data-tier="advanced">🔴 Advanced</button>
+      <button class="filter-btn" data-tier="saas">◈ SaaS Businesses</button>
+    </div>
+  </div>
+
+  <div class="results-bar">
+    <div class="results-count">Showing <span id="countDisplay">200</span> ideas</div>
+    <div class="sort-group">
+      <span class="sort-label">Sort</span>
+      <button class="sort-btn active" data-sort="num">#</button>
+      <button class="sort-btn" data-sort="name">Name</button>
+      <button class="sort-btn" data-sort="complexity">Complexity</button>
+      <button class="sort-btn" data-sort="time">Time</button>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th data-col="num">#<span class="sort-arrow">↕</span></th>
+          <th data-col="name">Business / Project Name<span class="sort-arrow">↕</span></th>
+          <th data-col="tier">Tier<span class="sort-arrow">↕</span></th>
+          <th data-col="complexity">Complexity<span class="sort-arrow">↕</span></th>
+          <th data-col="time">Build Time<span class="sort-arrow">↕</span></th>
+          <th data-col="category" class="col-mrr">MRR Potential / Category</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+    <div class="empty" id="emptyState" style="display:none">
+      <div class="empty-icon">◎</div>
+      No ideas match your search.
+    </div>
+  </div>
+
+  <footer>
+    <div class="legend">
+      <span class="legend-item"><span class="legend-dot beg"></span> Beginner (20 min–1.5 hrs / 2–4 wks)</span>
+      <span class="legend-item"><span class="legend-dot int"></span> Intermediate (2–3.5 hrs / 4–8 wks)</span>
+      <span class="legend-item"><span class="legend-dot adv"></span> Advanced (4–8+ hrs / 6–14 wks)</span>
+      <span class="legend-item"><span class="legend-dot saas"></span> SaaS Business (recurring revenue)</span>
+    </div>
+    <div>Built with Claude · Content Logic Dynamics</div>
+  </footer>
+
+</div>
+
+<script>
+const IDEAS = [
+  // ── Web App Ideas 1–150 ──────────────────────────────────────────
+  [1,  "AI Receipt & Expense Tracker",           "Beginner",     1, "~30 min",  "Finance / Productivity",        "Paste or upload a receipt and get auto-categorized expense data you can copy to a spreadsheet.", false, false],
+  [2,  "Personal Content Repurposer",            "Beginner",     1, "~30 min",  "Content Creation",              "Turn a long-form blog post or video transcript into tweets, LinkedIn posts, and email snippets.", false, false],
+  [3,  "Smart File Organizer",                   "Beginner",     1, "~45 min",  "Productivity",                  "Describe a messy folder structure and get a clean rename/folder plan with one-click copy-paste commands.", false, false],
+  [4,  "FAQ Chatbot Builder",                    "Beginner",     2, "~1 hr",    "Community / Support",           "Paste your FAQ content and generate a ready-to-embed chatbot script that answers customer questions.", false, false],
+  [5,  "Lead Research Summarizer",               "Beginner",     2, "~1 hr",    "Sales / Consulting",            "Input a company name and URL, get a structured research summary for pre-call prep.", false, false],
+  [6,  "AI Business Idea Validator",             "Beginner",     1, "~45 min",  "Entrepreneurship",              "Score any business idea across demand, competition, and monetization axes in under a minute.", false, false],
+  [7,  "AI Weekly Planner",                      "Beginner",     1, "~30 min",  "Productivity",                  "Input your goals and constraints; get a structured Mon–Fri daily plan with time blocks.", false, false],
+  [8,  "Community FAQ Bot Widget",               "Beginner",     2, "~1.5 hrs", "Community / Support",           "A copyable embed snippet that intercepts common support questions before they hit your inbox.", false, false],
+  [9,  "AI Cold Outreach Email Generator",       "Beginner",     1, "~45 min",  "Sales / Marketing",             "Fill in prospect name, company, and pain point — get a personalized cold email in seconds.", false, false],
+  [10, "ICP (Ideal Customer Profile) Builder",   "Beginner",     2, "~1 hr",    "Marketing / Strategy",          "Answer 8 questions about your business; receive a detailed ICP doc you can use in ads and copy.", false, false],
+  [11, "AI Automation Workflow Describer",       "Beginner",     2, "~1 hr",    "Automation Consulting",         "Describe a manual process; get a plain-English automation workflow map with tool suggestions.", false, false],
+  [12, "Social Media Caption Generator",         "Beginner",     1, "~30 min",  "Content Creation",              "Paste an image description or topic; get 5 platform-optimized captions with hashtag sets.", false, false],
+  [13, "AI Proposal Builder",                    "Beginner",     2, "~1 hr",    "Consulting / Sales",            "Fill in client name, project scope, and budget range; get a formatted proposal draft instantly.", false, false],
+  [14, "AI Testimonial Polisher",                "Beginner",     1, "~45 min",  "Marketing",                     "Paste a raw client testimonial; get a polished, permission-ready version with key quote pulled.", false, false],
+  [15, "AI Onboarding Questionnaire Generator",  "Beginner",     2, "~1.5 hrs", "Consulting / Coaching",         "Describe your service; get a complete client onboarding form you can drop into Typeform or Notion.", false, false],
+  [16, "AI Elevator Pitch Generator",            "Beginner",     1, "~20 min",  "Personal Branding",             "Describe what you do; get three 30-second pitch variants for different audiences.", false, false],
+  [17, "AI Brand Name Generator",                "Beginner",     1, "~25 min",  "Entrepreneurship",              "Enter your niche and vibe; get 20 brand name ideas with availability hints and domain suggestions.", false, false],
+  [18, "AI Meeting Notes Summarizer",            "Beginner",     2, "~45 min",  "Productivity",                  "Paste messy meeting notes; get structured action items, decisions, and a shareable summary.", false, false],
+  [19, "AI Headline Tester",                     "Beginner",     1, "~40 min",  "Copywriting",                   "Enter up to 5 headline variants; get scored feedback on clarity, curiosity, and click appeal.", false, false],
+  [20, "AI Daily Standup Generator",             "Beginner",     1, "~30 min",  "Productivity / Teams",          "Fill in yesterday's tasks, today's plan, and blockers — get a formatted async standup post.", false, false],
+  [21, "AI Content Calendar Builder",            "Intermediate", 3, "~2 hrs",   "Content Creation",              "Input your content pillars, posting frequency, and audience — get a 30-day calendar with hooks.", false, false],
+  [22, "AI Product Description Rewriter (Batch)","Intermediate", 3, "~2 hrs",   "E-commerce / SEO",              "Paste up to 20 product descriptions; get SEO-optimized rewrites in your brand voice.", false, false],
+  [23, "AI Career Path Advisor",                 "Intermediate", 3, "~2.5 hrs", "Coaching",                      "Input your current skills, experience, and goals; get a detailed career roadmap with milestones.", false, false],
+  [24, "AI Podcast Episode Planner",             "Intermediate", 4, "~3 hrs",   "Content Creation",              "Describe your show and guest; get a full episode outline with intro, questions, and CTA.", false, false],
+  [25, "AI Pricing Strategy Coach",              "Intermediate", 4, "~3 hrs",   "Business Strategy",             "Input your offer, audience, and costs; get tiered pricing recommendations with rationale.", false, false],
+  [26, "AI Course Outline Builder",              "Intermediate", 3, "~2.5 hrs", "Education / Coaching",          "Describe your course topic and audience; get a full module-by-module outline with learning outcomes.", false, false],
+  [27, "AI ROI Calculator for Automations",      "Intermediate", 3, "~2 hrs",   "Automation Consulting",         "Enter hours saved, hourly rate, and tool cost; get a clear ROI summary with payback period.", false, false],
+  [28, "AI Email Sequence Generator",            "Intermediate", 3, "~2.5 hrs", "Email Marketing",               "Define your lead magnet and offer; get a 5-part nurture sequence with subject lines and CTAs.", false, false],
+  [29, "AI YouTube Script Generator",            "Intermediate", 3, "~3 hrs",   "Content Creation",              "Enter title, angle, and length; get a full scripted video with hook, body, and end-screen CTA.", false, false],
+  [30, "AI Personal Knowledge Base",             "Intermediate", 4, "~3.5 hrs", "Productivity",                  "Paste notes, articles, and ideas; get a structured, searchable knowledge map with linked concepts.", false, false],
+  [31, "AI Multi-Persona Debate Simulator",      "Advanced",     4, "~4 hrs",   "Business Strategy",             "Enter a business decision; simulate debate from CFO, CMO, and skeptic personas to stress-test it.", false, false],
+  [32, "AI Competitor Analysis Dashboard",       "Advanced",     5, "~5 hrs",   "Market Research",               "Input competitor URLs and your own; get a side-by-side positioning, pricing, and messaging analysis.", false, false],
+  [33, "AI Brand Identity Generator",            "Advanced",     4, "~4.5 hrs", "Branding",                      "Answer brand discovery questions; get a full identity kit — voice, values, colors, and copy examples.", false, false],
+  [34, "AI Voice-Powered Coaching Assistant",    "Advanced",     5, "~5 hrs",   "Coaching / AI",                 "A voice-interface coaching bot that remembers session context and gives homework between calls.", false, false],
+  [35, "AI No-Code Workflow Builder",            "Advanced",     5, "~8+ hrs",  "Automation / No-Code",          "Describe a business process; get a fully documented no-code automation blueprint with tool configs.", false, false],
+  [36, "AI Bio Writer",                          "Beginner",     1, "~20 min",  "Personal Branding",             "Answer 5 quick questions; get a third-person bio in three lengths (short, medium, full).", false, false],
+  [37, "AI Job Description Generator",           "Beginner",     1, "~25 min",  "HR / Recruiting",               "Enter role, team, and must-haves; get a compelling JD that attracts the right candidates.", false, false],
+  [38, "AI Problem Reframer",                    "Beginner",     2, "~40 min",  "Coaching / Strategy",           "Describe a business problem; get 5 alternative framings that unlock different solution paths.", false, false],
+  [39, "AI Client Offboarding Message Gen.",     "Beginner",     1, "~30 min",  "Client Management",             "Enter project name and outcome; get a warm offboarding message with next-steps and re-engagement hook.", false, false],
+  [40, "AI Password Policy Explainer",           "Beginner",     1, "~30 min",  "Cybersecurity",                 "Paste a company password policy; get a plain-English explainer employees will actually read.", false, false],
+  [41, "AI Newsletter Builder",                  "Intermediate", 3, "~2.5 hrs", "Email Marketing",               "Input your topic, audience, and 3 news items; get a fully formatted newsletter ready to send.", false, false],
+  [42, "AI Resume Gap Analyzer",                 "Intermediate", 3, "~3 hrs",   "Career / Coaching",             "Paste a resume and target job description; get a gap analysis with specific skill-building suggestions.", false, false],
+  [43, "AI Quiz Generator",                      "Intermediate", 3, "~2 hrs",   "Education",                     "Paste any content; get a 10-question quiz with multiple choice, true/false, and an answer key.", false, false],
+  [44, "AI Product Launch Checklist Builder",    "Intermediate", 3, "~2.5 hrs", "Product / Marketing",           "Describe your product and launch date; get a phased pre/launch/post checklist with owners.", false, false],
+  [45, "AI SOP Writer",                          "Intermediate", 4, "~3.5 hrs", "Operations / Consulting",       "Describe a repeatable process; get a formatted SOP with steps, roles, and quality checkpoints.", false, false],
+  [46, "AI Market Research Report Generator",    "Advanced",     4, "~6 hrs",   "Market Research",               "Input industry, segment, and research questions; get a structured report with analysis and recommendations.", false, false],
+  [47, "AI Client Portal (Single Client View)",  "Advanced",     4, "~5 hrs",   "Consulting / CRM",              "A private portal per client showing deliverables, timelines, and communication threads.", false, false],
+  [48, "AI Website Copy Auditor",                "Advanced",     4, "~4 hrs",   "Copywriting / SEO",             "Paste page URLs; get a detailed audit of clarity, persuasion gaps, and SEO improvements.", false, false],
+  [49, "AI Automation Idea Engine",              "Advanced",     4, "~4.5 hrs", "Automation Consulting",         "Describe a business type and bottlenecks; get 10 ranked automation ideas with ROI estimates.", false, false],
+  [50, "AI Full Business Plan Wizard",           "Advanced",     5, "~8+ hrs",  "Business Strategy",             "Walk through a 12-step wizard; receive a complete investor-ready business plan document.", false, false],
+  [51, "Burnout Check-In Tool",                  "Beginner",     1, "~25 min",  "Coaching / Wellness",           "Answer a 10-question check-in; get a burnout score with personalized recovery suggestions.", false, false],
+  [52, "Story-Behind-the-Brand Generator",       "Beginner",     1, "~35 min",  "Personal Branding",             "Answer founder story questions; get a compelling origin narrative for about pages and pitches.", false, false],
+  [53, "Niche Validator",                        "Beginner",     2, "~45 min",  "Entrepreneurship",              "Describe your niche idea; get a viability score with competition, demand, and monetization ratings.", false, false],
+  [54, "AI Follow-Up Email Writer",              "Beginner",     1, "~30 min",  "Sales / Networking",            "Paste meeting context or last email thread; get a warm, non-pushy follow-up in seconds.", false, false],
+  [55, "Privacy Policy Generator (Simple)",      "Beginner",     1, "~30 min",  "Legal / Compliance",            "Answer basic data-collection questions; get a plain-English privacy policy for simple websites.", false, false],
+  [56, "AI Sales Call Script Builder",           "Intermediate", 4, "~3 hrs",   "Sales / Consulting",            "Enter offer, ICP, and objections; get a complete discovery-to-close call script with talk tracks.", false, false],
+  [57, "AI Landing Page Copy Generator",         "Intermediate", 4, "~3 hrs",   "Marketing / Copywriting",       "Describe your offer and audience; get hero, features, social proof, FAQ, and CTA copy blocks.", false, false],
+  [58, "AI Lesson Plan Builder",                 "Intermediate", 3, "~2.5 hrs", "Education / Coaching",          "Enter topic, age group, and duration; get a structured lesson plan with activities and assessments.", false, false],
+  [59, "AI Objection Handler Library",           "Intermediate", 3, "~2.5 hrs", "Sales",                         "List your top 10 objections; get scripted responses in consultative, assertive, and empathetic styles.", false, false],
+  [60, "AI A/B Test Idea Generator",             "Intermediate", 3, "~2 hrs",   "Marketing / CRO",               "Describe a page or email; get 10 ranked A/B test hypotheses with expected impact and effort scores.", false, false],
+  [61, "AI Agency Pitch Deck Content Gen.",      "Advanced",     5, "~6 hrs",   "Agency / Consulting",           "Input agency speciality and prospect; get full slide-by-slide pitch deck copy ready to design.", false, false],
+  [62, "AI Workflow Gap Finder",                 "Advanced",     5, "~6 hrs",   "Automation Consulting",         "Map your current workflow step-by-step; get a gap analysis with bottleneck scores and fix priorities.", false, false],
+  [63, "AI Contract Clause Generator",           "Advanced",     4, "~4.5 hrs", "Legal / Consulting",            "Describe your service and risk areas; get plain-language contract clauses you can take to a lawyer.", false, false],
+  [64, "AI Growth Experiment Tracker",           "Advanced",     4, "~5 hrs",   "Growth / Marketing",            "Log experiments with hypothesis and results; get an AI-analyzed learnings digest and next bets.", false, false],
+  [65, "AI Multi-Language Content Adapter",      "Advanced",     5, "~7 hrs",   "Content / International",       "Paste content + target locales; get culturally adapted versions (not just translated) for each market.", false, false],
+  [66, "AI Thank You Page Copy Generator",       "Beginner",     1, "~20 min",  "Marketing / Funnels",           "Enter what was purchased or downloaded; get a thank-you page with next-step offer and social share hooks.", false, false],
+  [67, "AI Hashtag & SEO Tag Generator",         "Beginner",     1, "~30 min",  "Content Creation / SEO",        "Paste content or a URL; get platform-specific hashtag sets and YouTube/Pinterest tag suggestions.", false, false],
+  [68, "AI Speaker Introduction Writer",         "Beginner",     1, "~30 min",  "Events / Speaking",             "Paste bio and talk title; get a 60-second introduction script for event hosts.", false, false],
+  [69, "AI Cancellation Recovery Email",         "Beginner",     1, "~25 min",  "Retention / Sales",             "Describe your product and cancellation reason; get a win-back email with relevant offer.", false, false],
+  [70, "AI Workshop Agenda Builder",             "Beginner",     2, "~40 min",  "Coaching / Facilitation",       "Enter topic, group size, and duration; get a timed agenda with icebreakers, exercises, and wrap-up.", false, false],
+  [71, "AI Webinar Script Builder",              "Intermediate", 4, "~3 hrs",   "Content / Sales",               "Enter webinar topic and offer; get a 60-minute script with pitch timing and slide cues.", false, false],
+  [72, "AI Referral Program Builder",            "Intermediate", 3, "~2.5 hrs", "Marketing / Growth",            "Describe your product and audience; get a referral program structure with incentives, copy, and flow.", false, false],
+  [73, "AI Customer Journey Mapper",             "Intermediate", 4, "~3.5 hrs", "Strategy / Consulting",         "Input customer type and touchpoints; get a stage-by-stage journey map with emotion and friction notes.", false, false],
+  [74, "AI 30-Day Challenge Creator",            "Intermediate", 3, "~2.5 hrs", "Community / Engagement",        "Enter topic and audience; get a full 30-day challenge plan with daily prompts and community guidelines.", false, false],
+  [75, "AI Tech Stack Recommender",              "Intermediate", 3, "~2 hrs",   "Automation Consulting",         "Describe your business size, budget, and needs; get a recommended tech stack with integration notes.", false, false],
+  [76, "AI Lead Magnet Factory",                 "Advanced",     5, "~6 hrs",   "Marketing / Lead Gen",          "Input niche and audience pain points; generate 5 full lead magnet concepts with outlines and hooks.", false, false],
+  [77, "AI Content Repurposing Pipeline",        "Advanced",     5, "~6 hrs",   "Content Creation",              "Paste one long-form piece; get 12+ derivative assets across formats and platforms with scheduling plan.", false, false],
+  [78, "AI Grant Proposal Generator",            "Advanced",     4, "~5 hrs",   "Nonprofit / Consulting",        "Input org mission, project, and budget; get a grant proposal draft aligned to common funder requirements.", false, false],
+  [79, "AI Internal Knowledge Audit Tool",       "Advanced",     5, "~7 hrs",   "Operations / Consulting",       "Map your team's knowledge assets; get a gap report with documentation priorities and ownership assignments.", false, false],
+  [80, "AI Video Sales Letter Script Builder",   "Advanced",     5, "~8 hrs",   "Copywriting / Sales",           "Enter offer, avatar, and price; get a full VSL script with AIDA structure, proof points, and close.", false, false],
+  [81, "AI End-of-Week Reflection Generator",    "Beginner",     1, "~25 min",  "Productivity / Coaching",       "Answer 5 prompts about your week; get a structured reflection with wins, lessons, and next-week focus.", false, false],
+  [82, "AI Event Invitation Copy Writer",        "Beginner",     1, "~25 min",  "Events / Marketing",            "Enter event details and audience; get invitation copy for email, social, and a printable flyer.", false, false],
+  [83, "AI Apology Email Writer",                "Beginner",     1, "~20 min",  "Communication",                 "Describe the situation; get a professional, empathetic apology email that rebuilds trust.", false, false],
+  [84, "AI Product Name + Tagline Generator",    "Beginner",     1, "~30 min",  "Entrepreneurship / Branding",   "Describe your product's core benefit; get 10 name + tagline pairs with vibe notes.", false, false],
+  [85, "AI Partnership Pitch Writer",            "Beginner",     2, "~35 min",  "Business Development",          "Describe both parties and the opportunity; get a short partnership pitch email and one-liner.", false, false],
+  [86, "AI Loyalty Program Builder",             "Intermediate", 3, "~2.5 hrs", "Marketing / Retention",         "Describe your product and customer base; get a tiered loyalty program structure with reward mechanics.", false, false],
+  [87, "AI Feedback Survey Generator",           "Intermediate", 3, "~2.5 hrs", "Research / Product",            "Enter what you want to learn; get a 12-question survey with rating scales, NPS, and open-ended prompts.", false, false],
+  [88, "AI Content Gap Auditor",                 "Intermediate", 4, "~3 hrs",   "Content / SEO",                 "Paste your sitemap or topic list; get an analysis of missing content with priority rankings.", false, false],
+  [89, "AI Partnership One-Pager Builder",       "Intermediate", 3, "~2.5 hrs", "Business Development",          "Enter your company and partner details; get a designed one-pager layout with copy blocks.", false, false],
+  [90, "AI Competitor Comparison Page Builder",  "Intermediate", 4, "~3 hrs",   "Marketing / Sales",             "List your product vs competitors; get a persuasive comparison page structure with battle card copy.", false, false],
+  [91, "AI Multi-Channel Campaign Builder",      "Advanced",     4, "~5 hrs",   "Marketing / Strategy",          "Input campaign goal and budget; get a coordinated plan across email, social, ads, and content.", false, false],
+  [92, "AI Employee Onboarding Portal Gen.",     "Advanced",     4, "~5 hrs",   "HR / Operations",               "Describe your company and role; get a structured onboarding portal with week-by-week milestones.", false, false],
+  [93, "AI Interactive Case Study Builder",      "Advanced",     4, "~5 hrs",   "Sales / Marketing",             "Input client results and context; get a full case study with narrative arc, data callouts, and quotes.", false, false],
+  [94, "AI Retention Email Sequence",            "Advanced",     4, "~4.5 hrs", "Email Marketing / SaaS",        "Map your churn moments; get a triggered retention sequence that activates before users quit.", false, false],
+  [95, "AI Financial Forecast Narrator",         "Advanced",     4, "~5 hrs",   "Finance / Business",            "Paste a financial model; get an executive-ready narrative that explains the numbers to non-finance stakeholders.", false, false],
+  [96, "AI Sales Pipeline Health Checker",       "Advanced",     4, "~4.5 hrs", "Sales / CRM",                   "Input your pipeline stages and deals; get a health score with coaching advice per stage.", false, false],
+  [97, "AI Community Launch Playbook",           "Advanced",     4, "~5 hrs",   "Community / Growth",            "Describe your community concept; get a 90-day launch playbook with content, events, and moderation plans.", false, false],
+  [98, "AI Mentorship Program Designer",         "Advanced",     5, "~6 hrs",   "Education / HR",                "Input org goals and mentor/mentee profiles; get a full program design with matching criteria and session guides.", false, false],
+  [99, "AI Narrative Pitch for Fundraising",     "Advanced",     5, "~6 hrs",   "Startups / Fundraising",        "Walk through a founder interview; get a narrative fundraising pitch deck script and exec summary.", false, false],
+  [100,"AI Customer Support Playbook Builder",   "Advanced",     5, "~7 hrs",   "Operations / Customer Success", "Map your support scenarios; get a complete playbook with macros, escalation paths, and CSAT strategies.", false, false],
+  [101,"AI Ideal Day Designer",                  "Beginner",     1, "~25 min",  "Productivity / Coaching",       "Describe your goals and energy patterns; get a structured ideal-day schedule with block times and buffers.", false, false],
+  [102,"AI Review Response Writer",              "Beginner",     1, "~20 min",  "Reputation / Customer Success", "Paste a customer review (positive or negative); get a professional, branded response ready to publish.", false, false],
+  [103,"AI Sub-Niche Finder",                    "Beginner",     2, "~35 min",  "Entrepreneurship",              "Enter your broad niche; get 10 specific sub-niches ranked by competition and monetization potential.", false, false],
+  [104,"AI Speaking Proposal Writer",            "Beginner",     1, "~30 min",  "Events / Speaking",             "Enter your talk title, angle, and bio; get a conference submission proposal draft.", false, false],
+  [105,"AI Product Hunt Launch Copy",            "Beginner",     1, "~25 min",  "Product / Marketing",           "Describe your product; get a tagline, description, and first comment optimized for Product Hunt launches.", false, false],
+  [106,"AI Coaching Package Designer",           "Intermediate", 3, "~2.5 hrs", "Coaching / Consulting",         "Describe your expertise and client outcomes; get 3 tiered package options with names, deliverables, and prices.", false, false],
+  [107,"AI Community Guidelines Generator",      "Intermediate", 3, "~2 hrs",   "Community / Operations",        "Describe your community type and values; get a full moderation guidelines document with examples.", false, false],
+  [108,"AI Affiliate Program Builder",           "Intermediate", 4, "~3 hrs",   "Marketing / Revenue",           "Input your product and margins; get a structured affiliate program with commission tiers, copy, and recruitment plan.", false, false],
+  [109,"AI Interview Question Generator",        "Intermediate", 3, "~2.5 hrs", "HR / Coaching",                 "Enter the role and competencies needed; get 20 structured interview questions with scoring rubrics.", false, false],
+  [110,"AI Launch Email Sequence",               "Intermediate", 4, "~3.5 hrs", "Email Marketing / Product",     "Describe your product launch date and audience; get a 7-email launch sequence with subject lines and send schedule.", false, false],
+  [111,"AI Revenue Diversification Advisor",     "Advanced",     4, "~5 hrs",   "Business Strategy / Finance",   "Input your current revenue streams and skills; get a diversification roadmap with new income models ranked by effort and upside.", true, false],
+  [112,"AI Brand Messaging Framework Builder",   "Advanced",     5, "~6 hrs",   "Branding / Marketing",          "Run through a deep brand discovery; get a complete messaging framework with positioning statement, pillars, and proof points.", true, false],
+  [113,"AI Product Roadmap Prioritizer",         "Advanced",     4, "~5 hrs",   "Product / Strategy",            "Input your feature backlog and business goals; get a RICE-scored roadmap with quarterly themes and cut recommendations.", true, false],
+  [114,"AI Automated Onboarding Email Engine",   "Advanced",     5, "~7 hrs",   "SaaS / Email Marketing",        "Map your user activation milestones; get a fully branching behavioral email engine with triggers, copy, and logic diagram.", true, false],
+  [115,"AI Thought Leadership Article Generator","Advanced",     4, "~4.5 hrs", "Content / Personal Branding",   "Enter your POV and target publication; get a full 1,500-word thought leadership article with SEO metadata and pitch email.", true, false],
+  [116,"AI Retention Risk Scorer",               "Advanced",     5, "~6 hrs",   "SaaS / Customer Success",       "Input cohort data and usage signals; get a churn risk model with intervention playbooks per risk tier.", true, false],
+  [117,"AI Franchise Operations Manual Gen.",    "Advanced",     5, "~8+ hrs",  "Operations / Franchising",      "Describe your business model and processes; get a structured franchise operations manual with training modules.", true, false],
+  [118,"AI Conversion Funnel Auditor",           "Advanced",     4, "~5 hrs",   "Marketing / CRO",               "Map your full funnel with conversion rates; get a prioritized fix list with copy, UX, and offer recommendations.", true, false],
+  [119,"AI Investor Update Generator",           "Advanced",     4, "~4 hrs",   "Startups / Investor Relations", "Input your metrics and milestones; get a polished monthly investor update email with narrative and ask.", true, false],
+  [120,"AI Talent Acquisition Strategy Builder", "Advanced",     5, "~7 hrs",   "HR / Recruiting",               "Input headcount goals and culture values; get a full recruiting strategy with sourcing channels, EVP, and interview process.", true, false],
+  [131,"AI Morning Routine Designer",            "Beginner",     1, "~20 min",  "Productivity / Wellness",       "Describe your schedule and goals; get a personalized morning routine with time blocks and habit stacks.", true, false],
+  [132,"AI Client Gift Idea Generator",          "Beginner",     1, "~25 min",  "Client Management",             "Enter client personality, budget, and industry; get 10 thoughtful gift ideas with sourcing suggestions.", true, false],
+  [133,"AI Reactivation Email Writer",           "Beginner",     1, "~25 min",  "Sales / Retention",             "Describe a dormant lead or lapsed customer; get a warm reactivation email with a relevant hook.", true, false],
+  [134,"AI Quote & Invoice Copy Enhancer",       "Beginner",     2, "~35 min",  "Consulting / Finance",          "Paste a plain quote or invoice; get a polished version with professional framing and value-reinforcing language.", true, false],
+  [135,"AI Press Release Writer",                "Beginner",     2, "~40 min",  "PR / Marketing",                "Describe a launch, hire, or milestone; get a properly formatted press release ready to distribute.", true, false],
+  [136,"AI Sales Territory Planner",             "Intermediate", 3, "~2.5 hrs", "Sales / Operations",            "Input regions, team size, and quotas; get a territory assignment plan with account prioritization matrix.", true, false],
+  [137,"AI Training Program Builder",            "Intermediate", 4, "~3.5 hrs", "HR / Education",                "Describe the skill gap and team size; get a structured training program with modules, exercises, and assessment criteria.", true, false],
+  [138,"AI Slack / Discord Bot Script Writer",   "Intermediate", 3, "~3 hrs",   "Community / Automation",        "Describe your community's recurring needs; get ready-to-deploy bot command scripts with response logic.", true, false],
+  [139,"AI Product FAQs Generator",              "Intermediate", 3, "~2 hrs",   "Product / Customer Success",    "Paste your product description and known friction points; get a 20-question FAQ with clear, conversion-friendly answers.", true, false],
+  [140,"AI Pitch Feedback Simulator",            "Intermediate", 4, "~3 hrs",   "Entrepreneurship / Coaching",   "Paste your pitch deck or script; get detailed investor-style feedback from skeptic, enthusiast, and operator personas.", true, false],
+  [141,"AI SaaS Pricing Page Optimizer",         "Advanced",     4, "~5 hrs",   "SaaS / Marketing",              "Input your plans, features, and conversion data; get a redesigned pricing page strategy with copy, comparison table, and FAQ.", true, false],
+  [142,"AI Enterprise Sales Playbook Builder",   "Advanced",     5, "~7 hrs",   "Sales / Enterprise",            "Map your deal stages, stakeholders, and objections; get a complete enterprise playbook with champion scripts and legal prep.", true, false],
+  [143,"AI Customer Segmentation Engine",        "Advanced",     5, "~6 hrs",   "Marketing / Data",              "Paste customer attributes and behaviors; get a segmentation model with persona cards, messaging guidelines, and channel recommendations.", true, false],
+  [144,"AI Board Deck Generator",                "Advanced",     4, "~5 hrs",   "Startups / Leadership",         "Input your KPIs, narrative, and decisions needed; get a structured board presentation with slide outlines and speaker notes.", true, false],
+  [145,"AI API Documentation Generator",         "Advanced",     4, "~5 hrs",   "Developer Tools / Technical",   "Paste your API endpoints and parameters; get clean, developer-friendly documentation with code examples in 3 languages.", true, false],
+  [146,"AI Churn Autopsy Report Builder",        "Advanced",     5, "~6 hrs",   "SaaS / Customer Success",       "Input churned account data and exit feedback; get a structured churn analysis with root causes, patterns, and prevention playbook.", true, false],
+  [147,"AI White-Label Productizer",             "Advanced",     5, "~7 hrs",   "Agency / Business Strategy",    "Describe your service; get a complete white-label product strategy with packaging, pricing, partner criteria, and go-to-market plan.", true, false],
+  [148,"AI OKR Cascade Builder",                 "Advanced",     4, "~5 hrs",   "Leadership / Operations",       "Input company-level objectives; get a full OKR cascade to department and individual levels with health metrics.", true, false],
+  [149,"AI Technical Specification Writer",      "Advanced",     5, "~6 hrs",   "Developer Tools / Product",     "Describe a feature or system requirement; get a complete technical spec with architecture notes, edge cases, and acceptance criteria.", true, false],
+  [150,"AI Go-to-Market Strategy Engine",        "Advanced",     5, "~8+ hrs",  "Business Strategy / Marketing", "Walk through a product and market discovery session; get a full GTM strategy with ICP, channels, messaging, launch phases, and metrics.", true, false],
+
+  // ══════════════════════════════════════════════════════════════
+  // SaaS BUSINESSES 151–200
+  // ══════════════════════════════════════════════════════════════
+  [151,"Micro-SaaS Review Reply Bot",            "Beginner", 2, "2–4 weeks", "$500–$3K MRR",  "A subscription tool that monitors Google, Yelp, and Trustpilot reviews and auto-drafts on-brand replies for local business owners — they approve with one click.", true, true, { targetCustomer:"Local business owners & agencies", revenueModel:"Monthly subscription per location", mrrPotential:"$500–$3K", pills:["$29–$79/mo per seat","Low churn","Agency resell"] }],
+  [152,"AI Job Post Writer SaaS",                "Beginner", 2, "2–3 weeks", "$1K–$5K MRR",  "HR teams and recruiters pay a monthly fee to generate compelling, bias-reduced job descriptions in under 60 seconds — integrates with Greenhouse and Lever via copy-paste.", true, true, { targetCustomer:"HR managers, recruiters, startups", revenueModel:"Per-seat monthly subscription", mrrPotential:"$1K–$5K", pills:["$19–$49/mo","High usage frequency","Seat expansion"] }],
+  [153,"Changelog & Release Notes SaaS",         "Beginner", 2, "2–4 weeks", "$1K–$6K MRR",  "SaaS teams connect their GitHub or Linear and automatically generate customer-friendly changelogs, in-app banners, and email digests — no copywriter needed.", true, true, { targetCustomer:"SaaS product & marketing teams", revenueModel:"Monthly flat subscription by team size", mrrPotential:"$1K–$6K", pills:["$49–$149/mo","Sticky workflow","GitHub integration"] }],
+  [154,"Client Reporting SaaS for Agencies",     "Beginner", 3, "3–5 weeks", "$2K–$8K MRR",  "Marketing agencies connect their ad accounts and the platform auto-generates white-labeled monthly PDF reports per client — saving 4–6 hours of manual work.", true, true, { targetCustomer:"Digital marketing agencies", revenueModel:"Per-client-seat monthly subscription", mrrPotential:"$2K–$8K", pills:["$29/client/mo","High retention","White-label upsell"] }],
+  [155,"AI Bio & Profile Page Builder SaaS",     "Beginner", 2, "2–3 weeks", "$800–$4K MRR", "Coaches, consultants, and speakers subscribe to generate and host a polished personal brand page — bio, testimonials, booking link, and social kit — updated by AI from a single prompt.", true, true, { targetCustomer:"Solopreneurs, coaches, speakers", revenueModel:"Monthly hosting + generation subscription", mrrPotential:"$800–$4K", pills:["$15–$39/mo","Large TAM","Freemium funnel"] }],
+  [156,"AI Proposal & Contract SaaS",            "Intermediate", 3, "4–6 weeks", "$3K–$12K MRR", "Freelancers and small agencies create, send, e-sign, and track proposals and contracts in one tool — AI pre-fills scope, pricing, and terms based on past wins.", true, true, { targetCustomer:"Freelancers, boutique agencies", revenueModel:"Monthly subscription + per-signature fee", mrrPotential:"$3K–$12K", pills:["$49–$99/mo","Sticky daily use","Upsell e-sign volume"] }],
+  [157,"SEO Content Brief SaaS",                 "Intermediate", 3, "4–6 weeks", "$4K–$15K MRR", "Content teams enter a keyword and receive a research-backed brief — SERP analysis, outline, H2s, internal link suggestions, and word count targets — ready to hand to a writer.", true, true, { targetCustomer:"Content marketers, SEO agencies", revenueModel:"Credit-based subscription (briefs/mo)", mrrPotential:"$4K–$15K", pills:["$79–$199/mo","High volume usage","Team seats"] }],
+  [158,"AI Customer Onboarding Checklist SaaS",  "Intermediate", 3, "4–6 weeks", "$3K–$10K MRR", "SaaS companies embed an AI-personalised onboarding checklist widget that adapts its steps to each user's role, industry, and usage — reducing time-to-value and support tickets.", true, true, { targetCustomer:"B2B SaaS companies (Series A–B)", revenueModel:"Monthly flat fee by MAU tier", mrrPotential:"$3K–$10K", pills:["$199–$599/mo","High ROI proof","Low churn"] }],
+  [159,"Niche Newsletter Monetisation SaaS",     "Intermediate", 4, "5–7 weeks", "$2K–$8K MRR",  "Newsletter operators connect their Beehiiv or ConvertKit audience; the platform identifies their most engaged segments and auto-generates sponsorship decks, ad rates, and pitch emails to land paid sponsors.", true, true, { targetCustomer:"Newsletter creators with 2K+ subscribers", revenueModel:"Revenue share + flat monthly fee", mrrPotential:"$2K–$8K", pills:["$49/mo + 5% rev share","Creator economy","Viral referral potential"] }],
+  [160,"AI Cold Email Personalisation Engine",   "Intermediate", 4, "5–8 weeks", "$5K–$20K MRR", "Sales teams paste a list of leads and the platform enriches each contact with LinkedIn and web data, then writes a unique personalised opening line for every email — at scale.", true, true, { targetCustomer:"B2B sales teams, SDRs, growth agencies", revenueModel:"Credit-based subscription (lines/mo)", mrrPotential:"$5K–$20K", pills:["$99–$299/mo","High repeat usage","API access upsell"] }],
+  [161,"AI Legal Document Simplifier SaaS",      "Advanced", 4, "6–10 weeks", "$5K–$20K MRR",  "SMBs and individuals upload contracts, NDAs, or terms documents; the platform returns a plain-English summary with risk flags, missing clauses, and suggested edits — no lawyer required for first review.", true, true, { targetCustomer:"SMB owners, freelancers, startup founders", revenueModel:"Credit subscription + team plan", mrrPotential:"$5K–$20K", pills:["$29–$99/mo","High perceived value","Viral word-of-mouth"] }],
+  [162,"Subscription Churn Prediction SaaS",     "Advanced", 5, "8–12 weeks", "$8K–$35K MRR",  "B2B SaaS companies connect their Stripe and product usage data; the platform scores each account's churn risk daily and pushes automated intervention tasks to the CS team in Slack or HubSpot.", true, true, { targetCustomer:"B2B SaaS companies with 200+ customers", revenueModel:"Monthly flat fee by customer account volume", mrrPotential:"$8K–$35K", pills:["$499–$1,499/mo","ROI-proven","Integrations moat"] }],
+  [163,"White-Label AI Chatbot SaaS",            "Advanced", 4, "6–10 weeks", "$6K–$25K MRR",  "Agencies resell a fully white-labelled AI chatbot platform to their clients — custom trained on client docs, embedded on their site, with a branded dashboard the client can hand to their support team.", true, true, { targetCustomer:"Digital agencies selling to SMBs", revenueModel:"Agency seat licence + per-client fee", mrrPotential:"$6K–$25K", pills:["$199/agency/mo + $49/client","Compounding agency channel","High LTV"] }],
+  [164,"AI-Powered Internal Wiki SaaS",          "Advanced", 4, "7–10 weeks", "$5K–$18K MRR",  "Growing teams connect Notion, Google Drive, and Confluence; the platform creates a single searchable AI layer that answers employee questions in plain English — reducing repeat Slack questions by 60%.", true, true, { targetCustomer:"Remote-first teams of 20–200 people", revenueModel:"Per-seat monthly subscription", mrrPotential:"$5K–$18K", pills:["$12–$20/seat/mo","Sticky daily use","Slack integration"] }],
+  [165,"Vertical AI Assistant SaaS (Real Estate)","Advanced", 5, "8–14 weeks", "$10K–$50K MRR", "Real estate agents subscribe to an AI assistant trained on property data, local market stats, and their own listing history — it writes listing descriptions, answers buyer questions, and drafts offer letters.", true, true, { targetCustomer:"Independent real estate agents & brokerages", revenueModel:"Monthly subscription per agent seat", mrrPotential:"$10K–$50K", pills:["$79–$149/seat/mo","Vertical moat","High willingness to pay"] }],
+  [166,"AI Invoice Dunning & Payment Recovery SaaS","Beginner", 2, "2–4 weeks","$1K–$6K MRR",  "Freelancers and agencies connect their invoicing tool; the platform auto-sends a timed sequence of polite but firm payment reminder emails — escalating in tone until the invoice is paid.", true, true, { targetCustomer:"Freelancers, consultants, small agencies", revenueModel:"Monthly flat subscription + % of recovered revenue", mrrPotential:"$1K–$6K", pills:["$19–$49/mo","High urgency pain","Stripe integration"] }],
+  [167,"Short-Form Video Repurposing SaaS",       "Intermediate", 3, "4–6 weeks","$3K–$14K MRR", "Creators and brands paste a long YouTube or podcast URL; the platform clips the best 60-second moments, adds auto-captions, and exports them as TikTok, Reels, and Shorts — ready to post.", true, true, { targetCustomer:"Content creators, social media managers, brands", revenueModel:"Credit-based subscription (clips/mo)", mrrPotential:"$3K–$14K", pills:["$49–$149/mo","High weekly usage","Creator + agency dual market"] }],
+  [168,"Employee Pulse Survey & Sentiment SaaS",  "Intermediate", 3, "4–6 weeks","$2K–$10K MRR", "HR teams send weekly 2-minute pulse surveys; the platform aggregates anonymous sentiment scores, surfaces trending themes, and flags burnout signals before they become resignation letters.", true, true, { targetCustomer:"HR managers, people ops teams (50–500 employees)", revenueModel:"Per-employee per-month subscription", mrrPotential:"$2K–$10K", pills:["$3–$6/employee/mo","Low churn HR tool","HRIS integration"] }],
+  [169,"AI Testimonial & Case Study Harvester",   "Intermediate", 3, "3–5 weeks","$1.5K–$7K MRR","Businesses set up automated post-delivery email sequences; the platform collects, scores, and organises customer testimonials and then drafts a polished case study from the best responses — ready to publish.", true, true, { targetCustomer:"Agencies, coaches, SaaS companies", revenueModel:"Monthly subscription by seats + case study credits", mrrPotential:"$1.5K–$7K", pills:["$39–$99/mo","Saves 3–5 hrs/case study","Social proof ROI"] }],
+  [170,"AI Competitor Intelligence Monitor SaaS", "Intermediate", 4, "5–7 weeks","$4K–$18K MRR", "Product and marketing teams enter competitor URLs; the platform watches for pricing changes, new feature launches, job postings, and ad copy shifts — then delivers a weekly digest with strategic commentary.", true, true, { targetCustomer:"Product managers, growth teams, founders", revenueModel:"Monthly subscription tiered by competitors tracked", mrrPotential:"$4K–$18K", pills:["$99–$299/mo","High strategic value","Low cancel rate"] }],
+  [171,"AI Onboarding Video Script SaaS",         "Beginner", 2, "2–3 weeks", "$800–$4K MRR",  "SaaS teams and course creators describe a feature or lesson; the platform writes a structured Loom-style script with hook, demo steps, and CTA — plus auto-generates a matching thumbnail title and description.", true, true, { targetCustomer:"SaaS product teams, online educators", revenueModel:"Monthly subscription by script volume", mrrPotential:"$800–$4K", pills:["$29–$69/mo","Fast time-to-value","High repeat usage"] }],
+  [172,"B2B CRM Enrichment & Lead Scoring SaaS",  "Advanced", 5, "8–12 weeks","$6K–$25K MRR",  "Sales teams connect HubSpot or Salesforce; the platform enriches every contact with firmographic data, LinkedIn signals, and intent data — then scores each lead and pushes prioritised outreach queues to reps daily.", true, true, { targetCustomer:"B2B sales teams with 10+ reps", revenueModel:"Monthly subscription by CRM contacts enriched", mrrPotential:"$6K–$25K", pills:["$299–$999/mo","Deep CRM integration","High switching cost"] }],
+  [173,"AI Slack & Teams Digest SaaS",            "Intermediate", 3, "4–5 weeks","$2K–$9K MRR",  "Busy teams install a bot that reads their noisiest Slack or Teams channels and delivers a personalised daily digest of decisions made, action items assigned, and key discussions — with zero manual curation.", true, true, { targetCustomer:"Remote teams, async-first companies", revenueModel:"Per-workspace monthly subscription", mrrPotential:"$2K–$9K", pills:["$49–$149/workspace/mo","Deep daily habit","Slack App Store distribution"] }],
+  [174,"AI Course & Cohort Community Manager SaaS","Advanced", 4, "6–10 weeks","$3K–$15K MRR",  "Course creators running live cohorts connect their Circle or Discord community; the platform auto-posts daily prompts, sends personalised accountability check-ins, flags at-risk students, and generates weekly progress reports for the instructor.", true, true, { targetCustomer:"Online course creators, cohort-based educators", revenueModel:"Monthly subscription per active cohort seat", mrrPotential:"$3K–$15K", pills:["$99–$299/mo","Creator economy","Completion rate ROI proof"] }],
+  [175,"AI Localisation & Cultural Adaptation SaaS","Advanced", 5, "8–12 weeks","$7K–$30K MRR",  "SaaS companies and e-commerce brands paste their marketing copy and UI strings; the platform delivers not just translations but culturally adapted versions per locale — adjusting idioms, imagery suggestions, CTA tone, and date/number formats for each market.", true, true, { targetCustomer:"SaaS companies expanding internationally, DTC brands", revenueModel:"Credit-based subscription (words/mo) + team seats", mrrPotential:"$7K–$30K", pills:["$199–$799/mo","Saves $30K+/yr vs agencies","Locale expansion upsell"] }],
+  [176,"AI Children's Picture Book Studio SaaS",  "Beginner", 2, "2–4 weeks", "$800–$5K MRR",  "Parents, teachers, and indie authors enter a story idea and characters; the platform generates a fully illustrated picture book with matched AI art and editable text — exportable as a print-ready PDF or ePub.", true, true, { targetCustomer:"Parents, indie authors, primary school teachers", revenueModel:"Credit subscription (books/mo) + print fulfillment upsell", mrrPotential:"$800–$5K", pills:["$15–$49/mo","Emotional purchase","Gift & print upsell"] }],
+  [177,"AI Game Narrative & Dialogue SaaS",       "Intermediate", 3, "4–6 weeks","$2K–$10K MRR", "Indie game studios and solo developers describe their game world, characters, and scene context; the platform generates branching dialogue trees, NPC responses, and narrative text — exportable as JSON for Unity or Godot.", true, true, { targetCustomer:"Indie game developers, narrative designers", revenueModel:"Credit subscription (dialogue nodes/mo)", mrrPotential:"$2K–$10K", pills:["$49–$149/mo","Underserved niche","Engine plugin upsell"] }],
+  [178,"AI Trading Card & Collectible Game Creator","Intermediate", 3, "4–6 weeks","$2K–$8K MRR", "Hobbyists, educators, and small publishers describe a theme or IP; the platform generates card artwork, writes card names, flavour text, and game stats — then lays them out in print-ready templates or digital formats.", true, true, { targetCustomer:"Tabletop game designers, educators, brand marketers", revenueModel:"Credit subscription (cards/mo) + print fulfillment partner", mrrPotential:"$2K–$8K", pills:["$29–$89/mo","Niche but passionate TAM","Print revenue share"] }],
+  [179,"AI Comic & Graphic Novel SaaS",           "Intermediate", 4, "5–8 weeks","$3K–$12K MRR", "Writers and creators describe scenes, characters, and panel layouts; the platform generates consistent AI artwork across panels, adds speech bubbles with copy, and exports a formatted comic page or full issue PDF.", true, true, { targetCustomer:"Indie comic creators, marketing teams, educators", revenueModel:"Credit subscription (pages/mo) + team collaboration plan", mrrPotential:"$3K–$12K", pills:["$59–$179/mo","Strong creator community","IP licensing potential"] }],
+  [180,"AI RPG World & Dungeon Builder SaaS",     "Intermediate", 4, "5–7 weeks","$2K–$9K MRR",  "Tabletop RPG game masters describe a setting and tone; the platform generates lore, maps (as illustrated image exports), encounter tables, NPC backstories, and session notes — all consistent within a shared world bible.", true, true, { targetCustomer:"Tabletop RPG game masters, worldbuilders", revenueModel:"Monthly subscription with world storage tiers", mrrPotential:"$2K–$9K", pills:["$12–$39/mo","Highly engaged niche","Community-led growth"] }],
+  [181,"AI Game Marketing Asset SaaS",            "Beginner", 2, "2–4 weeks", "$1.5K–$7K MRR", "Indie game developers describe their game; the platform generates a Steam store page description, App Store copy, social media posts, press kit text, and key art prompts — ready for launch day.", true, true, { targetCustomer:"Indie game developers, mobile studios", revenueModel:"Per-launch credit pack + monthly subscription", mrrPotential:"$1.5K–$7K", pills:["$29–$79/mo","High pain point at launch","Store optimisation upsell"] }],
+  [182,"AI Interactive Fiction & Visual Novel SaaS","Advanced", 4, "6–10 weeks","$4K–$18K MRR",  "Writers and studios describe their story world, character art style, and branching plot; the platform generates scene scripts, character expressions, background image prompts, and exports a playable Ren'Py or Twine project file.", true, true, { targetCustomer:"Visual novel studios, interactive fiction writers", revenueModel:"Monthly subscription + per-export credit", mrrPotential:"$4K–$18K", pills:["$99–$299/mo","Fast-growing genre","Export engine upsell"] }],
+  [183,"AI Brand Mascot & Sticker Pack SaaS",     "Beginner", 2, "2–3 weeks", "$1K–$6K MRR",   "Brands, streamers, and creators describe their personality and colour palette; the platform generates a consistent mascot character in multiple poses and expressions, plus a full sticker pack — exported as PNG, SVG, and Telegram/WhatsApp formats.", true, true, { targetCustomer:"Streamers, small brands, community managers", revenueModel:"One-time generation credit + monthly update subscription", mrrPotential:"$1K–$6K", pills:["$19–$59/pack","Viral gifting mechanic","Merch print upsell"] }],
+  [184,"AI Game Design Document SaaS",            "Advanced", 4, "6–9 weeks", "$3K–$14K MRR",  "Game designers describe their core loop, genre, and target platform; the platform generates a full GDD with mechanics, progression systems, monetisation model, art direction notes, and a feature prioritisation matrix — ready to share with a team or investor.", true, true, { targetCustomer:"Indie studios, game design students, mobile game founders", revenueModel:"Monthly subscription + team collaboration seats", mrrPotential:"$3K–$14K", pills:["$49–$149/mo","Pre-production critical tool","Investor deck upsell"] }],
+  [185,"AI Illustrated Story-to-Game Converter",  "Advanced", 5, "8–14 weeks","$5K–$22K MRR",  "Authors and IP holders upload a short story or book chapter; the platform generates a playable prototype — character sprites from the text descriptions, scene backgrounds, and a Twine or Godot-compatible script — bridging writing and game creation in one workflow.", true, true, { targetCustomer:"Authors, IP holders, game studios doing adaptations", revenueModel:"Per-project credit + studio subscription", mrrPotential:"$5K–$22K", pills:["$199–$599/project","Unique IP bridge","Publisher partnership channel"] }],
+
+  // ── NEW SaaS Batch 186–200 ──────────────────────────────────
+  [186,"AI Appointment Reminder & No-Show SaaS", "Beginner", 2, "2–3 weeks", "$1K–$5K MRR",
+    "Service businesses — salons, clinics, coaches — connect their booking tool and the platform sends personalised multi-channel reminders (SMS, email, WhatsApp) that cut no-shows by up to 70%, with one-click rescheduling built in.",
+    true, true,
+    { targetCustomer:"Salons, clinics, coaches, tutors", revenueModel:"Monthly subscription per business location", mrrPotential:"$1K–$5K", pills:["$29–$79/mo","Immediate ROI proof","Booking platform integrations"] }
+  ],
+  [187,"AI Menu & Specials Copy SaaS",            "Beginner", 2, "2–3 weeks", "$800–$4K MRR",
+    "Restaurants and cafés subscribe to generate weekly specials copy, seasonal menu descriptions, and social posts from a simple ingredient list — keeping their online presence fresh without a copywriter.",
+    true, true,
+    { targetCustomer:"Independent restaurants, cafés, food trucks", revenueModel:"Monthly flat subscription per venue", mrrPotential:"$800–$4K", pills:["$19–$49/mo","High repeat need","Local SEO upsell"] }
+  ],
+  [188,"AI Podcast Show Notes & SEO SaaS",        "Beginner", 2, "2–4 weeks", "$1K–$5K MRR",
+    "Podcasters paste or upload an episode transcript; the platform generates timestamped show notes, a keyword-optimised episode description, chapter markers, and a blog post summary — ready to publish across all directories.",
+    true, true,
+    { targetCustomer:"Independent podcasters, podcast networks", revenueModel:"Credit subscription (episodes/mo)", mrrPotential:"$1K–$5K", pills:["$19–$59/mo","High weekly usage","RSS + Spotify integration"] }
+  ],
+  [189,"AI Real Estate Listing Description SaaS", "Beginner", 2, "2–3 weeks", "$1.5K–$6K MRR",
+    "Agents enter property specs, photos, and neighbourhood highlights; the platform generates MLS-ready listing descriptions, social media captions, and email teaser copy — in the agent's brand voice — in under 60 seconds per property.",
+    true, true,
+    { targetCustomer:"Real estate agents, property managers", revenueModel:"Monthly subscription per agent seat", mrrPotential:"$1.5K–$6K", pills:["$39–$99/seat/mo","High listing volume","CRM integration upsell"] }
+  ],
+  [190,"AI e-Commerce Product Q&A SaaS",          "Beginner", 2, "2–4 weeks", "$1K–$5K MRR",
+    "Online store owners connect their Shopify or WooCommerce catalogue; the platform auto-answers incoming customer product questions using the existing product data and past Q&A history — reducing support tickets before checkout.",
+    true, true,
+    { targetCustomer:"Shopify & WooCommerce store owners", revenueModel:"Monthly subscription tiered by SKU count", mrrPotential:"$1K–$5K", pills:["$29–$99/mo","Reduces support costs","App store distribution"] }
+  ],
+  [191,"AI Social Proof Wall SaaS",               "Intermediate", 3, "4–5 weeks","$2K–$8K MRR",
+    "Businesses embed a dynamic proof wall on their site that pulls in live reviews from Google, G2, and Trustpilot, surfaces the most persuasive quotes using AI scoring, and A/B tests layouts automatically to maximise conversion lift.",
+    true, true,
+    { targetCustomer:"SaaS companies, e-commerce stores, coaches", revenueModel:"Monthly subscription tiered by page views", mrrPotential:"$2K–$8K", pills:["$49–$149/mo","Conversion ROI clear","Review platform integrations"] }
+  ],
+  [192,"AI Grant Finder & Application SaaS",      "Intermediate", 3, "4–7 weeks","$2K–$9K MRR",
+    "Nonprofits and small businesses describe their mission and location; the platform surfaces matching live grant opportunities, scores fit, and pre-fills application answers using the organisation's existing documents — cutting application time from days to hours.",
+    true, true,
+    { targetCustomer:"Nonprofits, small business owners, social enterprises", revenueModel:"Monthly subscription + per-application credit", mrrPotential:"$2K–$9K", pills:["$59–$149/mo","Strong mission alignment","High perceived value"] }
+  ],
+  [193,"AI HR Policy & Handbook Generator SaaS",  "Intermediate", 3, "4–6 weeks","$2K–$9K MRR",
+    "Founders and HR managers answer a company profile questionnaire; the platform generates a legally-structured employee handbook, remote work policy, and PTO policy — localised to their country and updated whenever employment law changes.",
+    true, true,
+    { targetCustomer:"Startups, SMBs scaling their first HR function", revenueModel:"Annual subscription + per-policy update fee", mrrPotential:"$2K–$9K", pills:["$99–$249/yr","High-urgency compliance pain","Legal review partner upsell"] }
+  ],
+  [194,"AI Influencer Brief & Contract SaaS",     "Intermediate", 4, "5–7 weeks","$3K–$12K MRR",
+    "Brand managers describe a campaign; the platform generates a creator brief with usage rights, deliverables, and deadlines, plus an influencer contract pre-filled with rates and FTC disclosure language — ready to send and e-sign in minutes.",
+    true, true,
+    { targetCustomer:"Brand marketing teams, influencer agencies", revenueModel:"Monthly subscription per brand seat + e-sign credits", mrrPotential:"$3K–$12K", pills:["$99–$299/mo","Creator economy growth","Legal + workflow in one"] }
+  ],
+  [195,"AI Subscription Box Curation SaaS",       "Intermediate", 3, "4–6 weeks","$2K–$8K MRR",
+    "Subscription box operators describe their niche and subscriber profiles; the platform recommends monthly product curation themes, writes unboxing card copy, generates social tease content, and scores each month's box against subscriber preference data.",
+    true, true,
+    { targetCustomer:"Subscription box operators (50–5K subscribers)", revenueModel:"Monthly flat subscription tiered by box volume", mrrPotential:"$2K–$8K", pills:["$79–$199/mo","Recurring ops workflow","Retention metric ROI"] }
+  ],
+  [196,"AI SaaS Onboarding Personalisation Engine","Advanced", 5, "8–12 weeks","$8K–$30K MRR",
+    "B2B SaaS companies integrate via API; the platform reads each new user's role, company size, and in-app behaviour on day 1 and dynamically personalises their entire onboarding flow — tooltip copy, checklist order, email sequence, and in-app prompts — to match their job-to-be-done.",
+    true, true,
+    { targetCustomer:"B2B SaaS companies with 500+ monthly signups", revenueModel:"Monthly fee tiered by MAU + implementation fee", mrrPotential:"$8K–$30K", pills:["$499–$2,499/mo","Activation rate ROI","Deep product integration"] }
+  ],
+  [197,"AI Franchise Recruitment Marketing SaaS", "Advanced", 4, "6–10 weeks","$5K–$20K MRR",
+    "Franchise brands describe their opportunity and ideal franchisee profile; the platform generates personalised recruitment landing pages, lead nurture email sequences, and FDD-compliant disclosure summaries — and tracks prospect engagement through a built-in CRM dashboard.",
+    true, true,
+    { targetCustomer:"Franchise brands with 5–200 units", revenueModel:"Monthly subscription per franchise brand + per-lead enrichment", mrrPotential:"$5K–$20K", pills:["$299–$999/mo","High-value deal cycle","FDD compliance upsell"] }
+  ],
+  [198,"AI Financial Wellness SaaS for Teams",    "Advanced", 4, "6–10 weeks","$4K–$16K MRR",
+    "Employers offer this as an employee benefit; workers connect their bank accounts and the AI delivers personalised weekly money insights, savings nudges, and debt paydown plans — all anonymised and aggregated for the HR team into a workforce financial health score.",
+    true, true,
+    { targetCustomer:"HR benefits managers at companies with 100–2,000 employees", revenueModel:"Per-employee per-month subscription via employer", mrrPotential:"$4K–$16K", pills:["$4–$8/employee/mo","Benefits budget line","Low cancel rate"] }
+  ],
+  [199,"AI Multi-Location Brand Consistency SaaS","Advanced", 5, "8–12 weeks","$6K–$25K MRR",
+    "Franchise and multi-location brands connect their social profiles, GMB listings, and ad accounts; the platform audits brand consistency across all locations, auto-corrects off-brand posts before publishing, and generates localised-but-on-brand content for each location manager.",
+    true, true,
+    { targetCustomer:"Franchise groups, multi-location retail & hospitality", revenueModel:"Monthly subscription per location", mrrPotential:"$6K–$25K", pills:["$29–$79/location/mo","Franchise ops pain","Brand protection moat"] }
+  ],
+  [200,"AI Predictive Hiring & Culture Fit SaaS", "Advanced", 5, "10–14 weeks","$8K–$35K MRR",
+    "Growing companies integrate with their ATS; the platform analyses job descriptions, team communication patterns, and past hiring outcomes to score each candidate for role fit and culture alignment — surfacing ranked shortlists with explainable reasoning for each hiring manager.",
+    true, true,
+    { targetCustomer:"Scale-up companies hiring 20+ roles/yr, HR tech buyers", revenueModel:"Annual subscription per hiring seat + per-assessment credit", mrrPotential:"$8K–$35K", pills:["$199–$599/seat/yr","ATS deep integration","Bias-reduction compliance angle"] }
+  ],
+];
+
+const tierMap = { 'Beginner':'beg', 'Intermediate':'int', 'Advanced':'adv' };
+
+function renderStars(n) {
+  return `<span class="stars">${'★'.repeat(n)}</span><span class="stars-empty">${'☆'.repeat(5-n)}</span>`;
+}
+
+let currentTier = 'all', currentSort = 'num', sortDir = 1, searchTerm = '';
+
+function getFiltered() {
+  return IDEAS.filter(r => {
+    const isSaaS = r[8];
+    if (currentTier === 'saas') return isSaaS;
+    const tierOk = currentTier === 'all' || r[2].toLowerCase() === currentTier;
+    const q = searchTerm.toLowerCase();
+    const saasData = r[9];
+    const blob = [r[1], r[5], r[6], saasData ? saasData.targetCustomer+' '+saasData.revenueModel+' '+saasData.pills.join(' ') : ''].join(' ').toLowerCase();
+    return tierOk && (!q || blob.includes(q));
+  });
+}
+
+function getSorted(arr) {
+  return [...arr].sort((a,b) => {
+    let va, vb;
+    if (currentSort==='num')        { va=a[0]; vb=b[0]; }
+    else if (currentSort==='name')  { va=a[1]; vb=b[1]; }
+    else if (currentSort==='complexity') { va=a[3]; vb=b[3]; }
+    else if (currentSort==='time')  { va=a[4]; vb=b[4]; }
+    else                            { va=a[0]; vb=b[0]; }
+    return va<vb ? -sortDir : va>vb ? sortDir : 0;
+  });
+}
+
+function buildRows(sorted) {
+  const rows = []; let div = false;
+  sorted.forEach((r,i) => {
+    if (r[8] && !div && currentSort==='num' && sortDir===1 && currentTier!=='saas') {
+      div = true; rows.push({type:'divider'});
+    }
+    rows.push({type:'row', data:r, idx:i});
+  });
+  return rows;
+}
+
+function render() {
+  const filtered = getSorted(getFiltered());
+  const tbody = document.getElementById('tableBody');
+  const empty = document.getElementById('emptyState');
+  document.getElementById('countDisplay').textContent = filtered.length;
+  if (!filtered.length) { tbody.innerHTML=''; empty.style.display='block'; return; }
+  empty.style.display = 'none';
+
+  tbody.innerHTML = buildRows(filtered).map(item => {
+    if (item.type==='divider') return `<tr class="section-divider"><td colspan="6"><div class="section-divider-inner"><div class="section-divider-label"><span class="sdl-icon">◈</span>SaaS Business Ideas — Software as a Service<span class="section-divider-count">50 businesses</span></div><div class="section-divider-line"></div></div></td></tr>`;
+
+    const r = item.data;
+    const [num,name,tier,complexity,buildTime,mrrOrCat,desc,isNew,isSaaS,saasData] = r;
+    const tc = tierMap[tier];
+    const newBadge = isNew ? `<span class="new-badge">New</span>` : '';
+    const saasBadge = isSaaS ? `<span class="cat-badge cat-saas" style="margin-left:6px">SaaS Biz</span>` : '';
+    const delay = Math.min(item.idx*12, 240);
+
+    let expandedContent = '';
+    if (isSaaS && saasData) {
+      const pills = saasData.pills.map(p=>`<span class="rev-pill">${p}</span>`).join('');
+      expandedContent = `<div class="td-desc">${desc}</div><div class="td-desc-saas"><span class="rev-pill" style="background:rgba(52,212,241,.12);border-color:rgba(52,212,241,.3);color:var(--saas)">👤 ${saasData.targetCustomer}</span><span class="rev-pill" style="background:rgba(52,212,241,.12);border-color:rgba(52,212,241,.3);color:var(--saas)">💳 ${saasData.revenueModel}</span>${pills}</div>`;
+    } else {
+      expandedContent = `<div class="td-desc">${desc||''}</div>`;
+    }
+
+    const mrrDisplay = isSaaS ? `<span class="td-mrr">${mrrOrCat}</span>` : `<span class="td-cat">${mrrOrCat}</span>`;
+
+    return `<tr data-id="${num}" data-expanded="false" style="animation-delay:${delay}ms">
+      <td class="td-num">${num}</td>
+      <td class="td-name"><div class="name-row"><div style="flex:1"><strong>${name}</strong>${newBadge}${saasBadge}<div class="td-desc-wrap">${expandedContent}</div></div><span class="td-chevron">›</span></div></td>
+      <td><span class="tier-badge tier-${tc}">${tier}</span></td>
+      <td>${renderStars(complexity)}</td>
+      <td class="td-time">${buildTime}</td>
+      <td class="col-mrr">${mrrDisplay}</td>
+    </tr>`;
+  }).join('');
+
+  tbody.querySelectorAll('tr[data-id]').forEach(tr => {
+    tr.addEventListener('click', () => { tr.dataset.expanded = tr.dataset.expanded==='true' ? 'false' : 'true'; });
+  });
+}
+
+document.getElementById('searchInput').addEventListener('input', e => { searchTerm=e.target.value; render(); });
+
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    currentTier = btn.dataset.tier;
+    document.querySelectorAll('.filter-btn').forEach(b => b.className='filter-btn');
+    btn.classList.add({all:'active-all',beginner:'active-beg',intermediate:'active-int',advanced:'active-adv',saas:'active-saas'}[currentTier]);
+    render();
+  });
+});
+
+document.querySelectorAll('.sort-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const s = btn.dataset.sort;
+    if (currentSort===s) sortDir*=-1; else { currentSort=s; sortDir=1; }
+    document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    render();
+  });
+});
+
+document.querySelectorAll('th[data-col]').forEach(th => {
+  th.addEventListener('click', () => {
+    const key = th.dataset.col==='tier' ? 'name' : th.dataset.col;
+    if (currentSort===key) sortDir*=-1; else { currentSort=key; sortDir=1; }
+    document.querySelectorAll('th').forEach(t => t.classList.remove('sort-active'));
+    th.classList.add('sort-active');
+    render();
+  });
+});
+
+render();
+</script>
+</body>
+</html>
